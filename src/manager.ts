@@ -113,7 +113,7 @@ export class Manager {
         });
         await manager
           .getRepository(User)
-          .createQueryBuilder()
+          .createQueryBuilder("user")
           .update()
           .where("user.username = :username", {
             username: j.to,
