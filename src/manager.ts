@@ -28,6 +28,7 @@ export class Manager {
   private bot: TelegramBot = new TelegramBot(process.env.MANAGER_TOKEN!);
   private ai = new AI();
   private clients: Map<string, TelegramClient> = new Map();
+  private code: string = '';
 
 
   private async callback(client: TelegramClient, e: NewMessageEvent) {}
@@ -143,5 +144,28 @@ export class Manager {
     this.bot.onText(/\/mail/, async (msg) => {
       await this.mail(15);
     })
+  }
+
+  private async onPhone(phone: string) {
+    const session = new StringSession();
+    const client = new TelegramClient(session, +process.env.TG_API_ID!, process.env.TG_API_HASH!, {});
+    this.code = '';
+    await client.start({
+      phoneNumber: phone,
+      onError(err) {
+        console.log(err);
+      },
+      phoneCode: async () => await new Promise((resolve, reject) => {
+        while (this.code === '') {
+        }
+        resolve(this.code);
+      })
+    });
+
+    const bot = new Bot();
+    bot.token = client.session.save()!;
+    bot.username = (await client.getMe()).username!;
+    await manager.save(bot);
+
   }
 }

@@ -11,7 +11,8 @@ export class AI {
     "utf-8",
   );
 
-  constructor() {}
+  constructor() {
+  }
 
   public async createFirstMessage(): Promise<{
     text: string;
