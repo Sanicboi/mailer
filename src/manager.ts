@@ -143,7 +143,23 @@ export class Manager {
 
     this.bot.onText(/\/mail/, async (msg) => {
       await this.mail(15);
+    });
+
+    this.bot.onText(/\/login/, async (msg) => {
+      await this.onPhone(msg.text!.split(' ')[1]);
+    });
+
+    this.bot.onText(/./, async (msg) => {
+      if (!msg.text?.startsWith('/')) {
+        await this.onCode(msg.text!);
+      }
     })
+
+    await this.bot.startPolling();
+  }
+
+  private async onCode(code: string) {
+    this.code = code;
   }
 
   private async onPhone(phone: string) {
