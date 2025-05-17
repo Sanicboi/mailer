@@ -51,8 +51,12 @@ export class Manager {
     const u = dialog.entity as Api.User;
     const user = bot.users.find(el => el.username = u.username!);
     if (!user) return;
-    await client.invoke(new Api.messages.SetTyping({
+    await client.invoke(new Api.messages.ReadHistory({
       peer: user.username
+    }));
+    await client.invoke(new Api.messages.SetTyping({
+      peer: user.username,
+      action: new Api.SendMessageTypingAction()
     }));
     await new Promise((res, rej) => setTimeout(res, 1000 * 5));
     const res = await this.ai.respond(e.message.text, user.lastMsgId!);
