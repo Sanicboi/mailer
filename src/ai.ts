@@ -23,6 +23,7 @@ export class AI {
       model: "gpt-4o",
       instructions: this.prompt,
       store: true,
+      temperature: 0.8
     });
 
     return {
