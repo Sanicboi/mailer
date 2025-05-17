@@ -111,20 +111,14 @@ export class Manager {
         await j.client.sendMessage(j.to, {
           message: j.text,
         });
-        await manager
-          .getRepository(User)
-          .createQueryBuilder("user")
-          .update()
-          .where("user.username = :username", {
-            username: j.to,
-          })
-          .set({
-            lastMsgId: j.id,
-            bot: {
-              token: j.client.session.save()!,
-            },
-          })
-          .execute();
+        const user = await manager.findOneBy(User, {
+          username: j.to
+        });
+        if (!user) return;
+        user.lastMsgId = j.id;
+        user.bot = new Bot();
+        user.bot.token = j.client.session.save()!;
+        await manager.save(user);
       },
       bots.length,
       60 * 4,
