@@ -20,7 +20,7 @@ export class AI {
   }> {
     const res = await this.openai.responses.create({
       input: "Начни диалог",
-      model: "gpt-4.1-nano",
+      model: "gpt-4o",
       instructions: this.prompt,
       store: true,
     });

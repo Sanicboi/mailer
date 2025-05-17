@@ -1,5 +1,5 @@
 import TelegramBot from "node-telegram-bot-api";
-import { client, TelegramClient } from "telegram";
+import { Api, client, TelegramClient } from "telegram";
 import { AppDataSource } from "./data-source";
 import { Bot } from "./entity/Bot";
 import { StringSession } from "telegram/sessions";
@@ -33,7 +33,35 @@ export class Manager {
   private code: string = '';
 
 
-  private async callback(client: TelegramClient, e: NewMessageEvent) {}
+  private async callback(client: TelegramClient, e: NewMessageEvent) {
+    if (e.isPrivate) {
+      const bot = await manager.findOne(Bot, {
+        where: {
+          blocked: false,
+          token: client.session.save()!
+        },
+        relations: {
+          users: true
+        }
+      });
+    if (!bot) return;
+    const dialogs = await client.getDialogs();
+    const dialog = dialogs.find(el => el.entity?.className === 'User' && el.entity.id.toJSON() === e.message.senderId?.toJSON());
+    if (!dialog) return;
+    const u = dialog.entity as Api.User;
+    const user = bot.users.find(el => el.username = u.username!);
+    if (!user) return;
+    const res = await this.ai.respond(e.message.text, user.lastMsgId!);
+    user.lastMsgId = res.id;
+    await manager.save(user);
+    await client.sendMessage(user.username, {
+      message: res.text
+    });
+    }
+
+
+    
+  }
 
   constructor() {}
 
