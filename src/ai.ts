@@ -33,7 +33,8 @@ export class AI {
           type: 'message',
           content: [{
             type: 'input_file',
-            file_data: this.file.toString('base64')
+            file_data: `data:application/pdf;base64,${this.file.toString('base64')}`,
+            filename: 'main.pdf'
           }, {
             type: 'input_text',
             text: 'Начни диалог'
