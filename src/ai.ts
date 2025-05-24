@@ -10,6 +10,9 @@ export class AI {
     path.join(process.cwd(), "prompt.txt"),
     "utf-8",
   );
+  private readonly file: Buffer = fs.readFileSync(
+    path.join(process.cwd(), 'main.pdf')
+  );
 
   constructor() {
   }
@@ -19,10 +22,26 @@ export class AI {
     id: string;
   }> {
     const res = await this.openai.responses.create({
-      input: "Начни диалог",
+      input: [
+        {
+          role: 'developer',
+          type: 'message',
+          content: this.prompt
+        },
+        {
+          role: 'user',
+          type: 'message',
+          content: [{
+            type: 'input_file',
+            file_data: this.file.toString('base64')
+          }, {
+            type: 'input_text',
+            text: 'Начни диалог'
+          }]
+        }
+      ],
       model: "gpt-4o",
-      instructions: this.prompt,
-      store: true,
+      store: true
     });
 
     return {
@@ -40,8 +59,7 @@ export class AI {
   }> {
     const res = await this.openai.responses.create({
       input: msg,
-      model: "gpt-4.1-nano",
-      instructions: this.prompt,
+      model: "gpt-4o",
       store: true,
       previous_response_id: prev,
     });

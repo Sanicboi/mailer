@@ -30,7 +30,6 @@ export class Manager {
   });
   private ai = new AI();
   private clients: Map<string, TelegramClient> = new Map();
-  private code: string = '';
 
 
   private async callback(client: TelegramClient, e: NewMessageEvent) {

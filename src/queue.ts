@@ -20,11 +20,9 @@ export class Queue<Job, Result> {
   public async addAndProcess(jobs: Job[]): Promise<Result[]> {
     let results: Result[] = [];
     for (let i = 0; i < jobs.length; i++) {
-      if ((i % this.bufferSize === 0 && i !== 0) || i + 1 === jobs.length) {
+      if (i % this.bufferSize === 0 && i !== 0) {
         results = results.concat(await this.end());
-        if (i + 1 !== jobs.length) {
-          await this.wait(this.waitTime);
-        }
+        await this.wait(this.waitTime);
       }
 
       this.jobs.push(this.callback(jobs[i]));

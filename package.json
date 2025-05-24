@@ -24,6 +24,7 @@
     "start": "ts-node src/index.ts",
     "typeorm": "typeorm-ts-node-commonjs",
     "format": "prettier --write .",
-    "login": "ts-node src/login.ts"
+    "login": "ts-node src/login.ts",
+    "parser": "ts-node src/parse.ts"
   }
 }
