@@ -43,7 +43,7 @@ export class AI {
       ],
       model: "gpt-4o",
       store: true,
-      temperature: 0.8
+      temperature: 0.7
     });
 
     return {
@@ -64,7 +64,7 @@ export class AI {
       model: "gpt-4o",
       store: true,
       previous_response_id: prev,
-      temperature: 0.8
+      temperature: 0.7
     });
 
     return {
