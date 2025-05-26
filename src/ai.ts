@@ -43,7 +43,7 @@ export class AI {
       ],
       model: "gpt-4o",
       store: true,
-      temperature: 1.1
+      temperature: 0.8
     });
 
     return {
