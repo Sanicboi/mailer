@@ -120,7 +120,7 @@ export class AI {
           ],
           model: "gpt-4.1",
           store: true,
-          temperature: 0.5
+          temperature: 0.9
         });
         break;
       }
