@@ -67,7 +67,7 @@ export class AI {
             filename: 'main.pdf'
           }, {
             type: 'input_text',
-            text: 'Начни диалог'
+            text: 'начни диалог и общайся строго по структуре'
           }]
         }
       ],
