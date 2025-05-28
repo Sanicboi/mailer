@@ -95,7 +95,7 @@ export class AI {
       store: true,
       previous_response_id: prev,
       temperature: 1,
-      tools: this.tools
+      // tools: this.tools
     });
 
     for (const out of res.output) {
