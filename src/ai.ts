@@ -94,7 +94,7 @@ export class AI {
       model: "gpt-4.1",
       store: true,
       previous_response_id: prev,
-      temperature: 0.8,
+      temperature: 1,
       // tools: this.tools
     });
 
