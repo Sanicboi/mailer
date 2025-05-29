@@ -42,6 +42,7 @@ export class AI {
   );
 
   constructor() {
+    console.log(this.prompt);
   }
 
   public async createFirstMessage(): Promise<{
