@@ -125,6 +125,7 @@ export class Manager {
     const generateQueue = new Queue<GenerationJob, GenerationResult>(
       async (j) => {
         const res = await this.ai.createFirstMessage();
+        console.log(res);
         return {
           ...j,
           ...res,
