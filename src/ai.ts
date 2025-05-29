@@ -40,9 +40,6 @@ export class AI {
     path.join(process.cwd(), "prompt.txt"),
     "utf-8",
   );
-  private readonly file: Buffer = fs.readFileSync(
-    path.join(process.cwd(), 'main.pdf')
-  );
 
   constructor() {
   }
@@ -52,22 +49,14 @@ export class AI {
     id: string;
   }> {
     const res = await this.openai.responses.create({
+      instructions: this.prompt,
       input: [
-        {
-          role: 'developer',
-          type: 'message',
-          content: this.prompt
-        },
         {
           role: 'user',
           type: 'message',
           content: [{
-            type: 'input_file',
-            file_data: `data:application/pdf;base64,${this.file.toString('base64')}`,
-            filename: 'main.pdf'
-          }, {
             type: 'input_text',
-            text: 'начни диалог и общайся строго по структуре'
+            text: 'начни диалог'
           }]
         }
       ],
@@ -95,6 +84,7 @@ export class AI {
       store: true,
       previous_response_id: prev,
       temperature: 0.9,
+      instructions: this.prompt
       // tools: this.tools
     });
 
@@ -120,7 +110,8 @@ export class AI {
           ],
           model: "gpt-4.1",
           store: true,
-          temperature: 1
+          temperature: 1,
+          instructions: this.prompt
         });
         break;
       }
