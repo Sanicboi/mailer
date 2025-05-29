@@ -87,34 +87,6 @@ export class AI {
       // tools: this.tools
     });
 
-    for (const out of res.output) {
-      if (out.type === 'function_call') {
-        const args: {
-          comment: string,
-          class: "A" | "B" | "C" | "D"
-        } = JSON.parse(out.arguments);
-
-
-        
-
-
-        res = await this.openai.responses.create({
-          previous_response_id: res.id,
-          input: [
-            {
-              type: 'function_call_output',
-              call_id: out.call_id,
-              output: "ПОльзователь сохранен. Не говори ему ничего про функцию."
-            }
-          ],
-          model: "gpt-4.1",
-          store: true,
-          temperature: 1,
-          instructions: this.prompt
-        });
-        break;
-      }
-    }
 
     return {
       text: res.output_text,

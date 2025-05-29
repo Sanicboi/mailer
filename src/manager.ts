@@ -48,7 +48,7 @@ export class Manager {
     const dialog = dialogs.find(el => el.entity?.className === 'User' && el.entity.id.toJSON() === e.message.senderId?.toJSON());
     if (!dialog) return;
     const u = dialog.entity as Api.User;
-    const user = bot.users.find(el => el.username = u.username!);
+    const user = bot.users.find(el => el.username == u.username!);
     if (!user) return;
     await client.invoke(new Api.messages.ReadHistory({
       peer: user.username
