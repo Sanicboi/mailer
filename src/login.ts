@@ -30,6 +30,7 @@ AppDataSource.initialize().then(async () => {
         console.log(err);
       },
       phoneCode: async () => await input.text("Code:"),
+      password: async () => await input.text("Password:")
     });
     const bot = new Bot();
     bot.token = client.session.save()!;
