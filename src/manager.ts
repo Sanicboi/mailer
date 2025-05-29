@@ -60,6 +60,7 @@ export class Manager {
     await new Promise((res, rej) => setTimeout(res, 1000 * 5));
     console.log(user);
     const res = await this.ai.respond(e.message.text, user.lastMsgId!);
+    console.log(user, user.lastMsgId, res.id);
     user.lastMsgId = res.id;
     await manager.save(user);
     await client.sendMessage(user.username, {
@@ -145,17 +146,18 @@ export class Manager {
 
     const sendQueue = new Queue<MailingJob, any>(
       async (j) => {
-        await j.client.sendMessage(j.to, {
-          message: j.text,
-        });
         const user = await manager.findOneBy(User, {
           username: j.to
         });
         if (!user) return;
+        console.log(user, user.lastMsgId, j.id);
         user.lastMsgId = j.id;
         user.bot = new Bot();
         user.bot.token = j.client.session.save()!;
         await manager.save(user);
+        await j.client.sendMessage(j.to, {
+          message: j.text,
+        });
       },
       bots.length,
       2,
