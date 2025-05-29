@@ -158,7 +158,7 @@ export class Manager {
         await manager.save(user);
       },
       bots.length,
-      60 * 4,
+      2,
     );
 
     await sendQueue.addAndProcess(
