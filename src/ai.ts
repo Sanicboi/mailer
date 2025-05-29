@@ -60,9 +60,8 @@ export class AI {
           }]
         }
       ],
-      model: "gpt-4.1",
+      model: "gpt-4o",
       store: true,
-      temperature: 1
     });
 
     return {
@@ -80,10 +79,9 @@ export class AI {
   }> {
     let res = await this.openai.responses.create({
       input: msg,
-      model: "gpt-4.1",
+      model: "gpt-4o",
       store: true,
       previous_response_id: prev,
-      temperature: 0.9,
       instructions: this.prompt
       // tools: this.tools
     });
