@@ -4,6 +4,7 @@
   "description": "Awesome project developed with TypeORM.",
   "type": "commonjs",
   "devDependencies": {
+    "@types/exceljs": "^0.5.3",
     "@types/node": "^22.13.10",
     "prettier": "^3.5.3",
     "ts-node": "^10.9.2",
@@ -13,13 +14,16 @@
     "@types/node-telegram-bot-api": "^0.64.8",
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",
+    "exceljs": "^4.4.0",
     "input": "^1.0.1",
+    "meilisearch": "^0.50.0",
     "node-telegram-bot-api": "^0.66.0",
     "openai": "^4.98.0",
     "pg": "^8.14.1",
     "reflect-metadata": "^0.2.2",
     "telegram": "^2.26.22",
-    "typeorm": "0.3.24"
+    "typeorm": "0.3.24",
+    "zod": "^3.25.46"
   },
   "scripts": {
     "start": "ts-node src/index.ts",
