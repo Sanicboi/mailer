@@ -40,6 +40,7 @@ import path from "path";
   }[] = JSON.parse(
     await fs.readFile(path.join(process.cwd(), "results.temp.json"), "utf-8")
   );
+  preprocessed = preprocessed.filter(el => el.username);
 
   const Comparison = z.object({
     same: z.boolean(),
@@ -47,7 +48,7 @@ import path from "path";
 
   for (let i = 0; i < preprocessed.length; i++) {
     const supplier = preprocessed[i];
-    console.log(`Ищу ${supplier.fullName}...`);
+    console.log(`Ищу ${supplier.fullName}`);
     try {
       const url = new URL("https://wildberries.ru/catalog/0/search.aspx");
       url.searchParams.set("search", `ИП ${supplier.fullName}`);

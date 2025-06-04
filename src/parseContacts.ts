@@ -37,7 +37,8 @@ import { generateRandomBigInt } from "telegram/Helpers";
     await fs.readFile(path.join(process.cwd(), "users.temp.txt"), "utf-8")
   )
     .split("\n")
-    .filter((el) => el);
+    .filter((el) => el)
+    .map(el => el.startsWith('+') ? el : '+' + el);
 
   let loggedbefore: {
     [phone: string]: string;
