@@ -10,9 +10,11 @@
     "ts-node": "^10.9.2"
   },
   "dependencies": {
+    "@types/exceljs": "^0.5.3",
     "@types/node-telegram-bot-api": "^0.64.8",
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",
+    "exceljs": "^4.4.0",
     "input": "^1.0.1",
     "node-telegram-bot-api": "^0.66.0",
     "openai": "^4.98.0",
@@ -20,9 +22,9 @@
     "puppeteer": "^24.10.0",
     "reflect-metadata": "^0.2.2",
     "telegram": "^2.26.22",
+    "tough-cookie": "^3.0.0",
     "typeorm": "0.3.24",
-    "zod": "^3.25.46",
-    "tough-cookie": "^3.0.0"
+    "zod": "^3.25.46"
   },
   "scripts": {
     "start": "ts-node src/index.ts",
@@ -31,6 +33,7 @@
     "login": "ts-node src/login.ts",
     "parser": "ts-node src/parseContacts.ts",
     "puppeteer": "ts-node src/puppeteer.ts",
-    "parse-all": "tsc && bun ./build/parseAll.js"
+    "parse-all": "tsc && bun ./build/parseAll.js",
+    "test": "ts-node src/test.ts"
   }
 }
