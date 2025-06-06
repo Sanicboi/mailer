@@ -45,7 +45,7 @@ export class AI {
     console.log(this.prompt);
   }
 
-  public async createFirstMessage(): Promise<{
+  public async createFirstMessage(data: string): Promise<{
     text: string;
     id: string;
   }> {
@@ -57,7 +57,7 @@ export class AI {
           type: 'message',
           content: [{
             type: 'input_text',
-            text: 'начни диалог'
+            text: `начни диалог. Вот данные о клиенте: ${data}`
           }]
         }
       ],

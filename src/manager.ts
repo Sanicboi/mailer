@@ -11,6 +11,7 @@ import { Queue } from "./queue";
 
 interface GenerationJob {
   to: string;
+  data: string;
 }
 
 interface GenerationResult extends GenerationJob {
@@ -125,7 +126,7 @@ export class Manager {
 
     const generateQueue = new Queue<GenerationJob, GenerationResult>(
       async (j) => {
-        const res = await this.ai.createFirstMessage();
+        const res = await this.ai.createFirstMessage(j.data);
         console.log(res);
         return {
           ...j,
@@ -139,6 +140,7 @@ export class Manager {
     let messages = await generateQueue.addAndProcess(
       users.map<GenerationJob>((el) => ({
         to: el.username,
+        data: el.additionalData
       })),
     );
 
@@ -160,7 +162,7 @@ export class Manager {
         });
       },
       bots.length,
-      2,
+      4 * 60,
     );
 
     await sendQueue.addAndProcess(

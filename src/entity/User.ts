@@ -17,6 +17,11 @@ export class User {
   })
   lastMsgId: string | null;
 
+  @Column('text', {
+    default: ''
+  })
+  additionalData: string;
+
   @ManyToOne(() => Bot, (bot) => bot.users)
   bot: Bot;
 }
