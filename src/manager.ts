@@ -59,8 +59,8 @@ export class Manager {
       action: new Api.SendMessageTypingAction()
     }));
     await new Promise((res, rej) => setTimeout(res, 1000 * 5));
-    console.log(user);
-    const res = await this.ai.respond(e.message.text, user.lastMsgId!);
+    const me = await client.getMe();
+    const res = await this.ai.respond(e.message.text, user.lastMsgId!, me.firstName!);
     console.log(user, user.lastMsgId, res.id);
     user.lastMsgId = res.id;
     await manager.save(user);

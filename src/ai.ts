@@ -74,6 +74,7 @@ export class AI {
   public async respond(
     msg: string,
     prev: string,
+    name: string
   ): Promise<{
     text: string;
     id: string;
