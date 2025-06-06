@@ -149,7 +149,7 @@ export class Manager {
         };
       },
       30,
-      0.5
+      1
     );
 
     let messages = await generateQueue.addAndProcess(
