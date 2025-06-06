@@ -6,7 +6,10 @@ export class Bot {
   @PrimaryColumn()
   token: string;
 
-  @Column()
+  @Column({
+    default: '',
+    nullable: true
+  })
   username: string;
 
   @OneToMany(() => User, (user) => user.bot)
