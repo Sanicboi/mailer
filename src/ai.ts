@@ -84,7 +84,7 @@ export class AI {
       model: "gpt-4o",
       store: true,
       previous_response_id: prev,
-      instructions: this.prompt
+      instructions: `Тебя зовут: ${name}\n\n` + this.prompt
       // tools: this.tools
     });
 
