@@ -61,7 +61,7 @@ export class AI {
           }]
         }
       ],
-      model: "gpt-4o",
+      model: "gpt-4.1-mini",
       store: true,
     });
 
