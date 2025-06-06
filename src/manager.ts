@@ -97,13 +97,12 @@ export class Manager {
         +process.env.TG_API_ID!,
         process.env.TG_API_HASH!,
         {
-          // proxy: {
-          //   ip: process.env.PROXY_IP!,
-          //   port: +process.env.PROXY_PORT!,
-          //   secret: process.env.PROXY_SECRET!,
-          //   MTProxy: true
-          // }
-          timeout: 2
+          proxy: {
+            ip: process.env.PROXY_IP!,
+            port: +process.env.PROXY_PORT!,
+            secret: process.env.PROXY_SECRET!,
+            MTProxy: true
+          }
         },
       );
       const res = await client.connect();
