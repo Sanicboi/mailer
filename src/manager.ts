@@ -151,6 +151,7 @@ export class Manager {
       })),
     );
 
+    console.log(messages);
 
 
     const sendQueue = new Queue<MailingJob, any>(
