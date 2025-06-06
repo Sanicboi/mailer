@@ -103,6 +103,7 @@ export class Manager {
           //   secret: process.env.PROXY_SECRET!,
           //   MTProxy: true
           // }
+          timeout: 2
         },
       );
       const res = await client.connect();
@@ -185,7 +186,7 @@ export class Manager {
 
   public async start() {
     await this.reload();
-
+    console.log('done connecting')
     this.bot.onText(/\/mail/, async (msg) => {
       await this.mail(15);
     });
