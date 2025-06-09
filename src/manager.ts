@@ -54,6 +54,9 @@ export class Manager {
       const u = dialog.entity as Api.User;
       const user = bot.users.find((el) => el.username === u.username!);
       if (!user) return;
+      if (!user.replied) {
+        user.replied = true;
+      }
       await client.invoke(
         new Api.messages.ReadHistory({
           peer: user.username,
@@ -176,6 +179,8 @@ export class Manager {
           await j.client.sendMessage(j.to, {
             message: j.text,
           });
+          user.sent = true;
+          await manager.save(user);
         } catch (e) {
           console.error(e);
         }
@@ -192,6 +197,17 @@ export class Manager {
         };
       })
     );
+  }
+
+  public async stats(chat: number) {
+    const users = await manager.find(User);
+    const sentTo = users.filter(el => el.sent).length;
+    const replied = users.filter(el => el.replied).length;
+    await this.bot.sendMessage(chat, `
+        Всего пользователей: ${users.length}
+        Из них получили сообщение: ${sentTo}
+        Из них ответили: ${replied}
+      `);
   }
 
   public async start() {
