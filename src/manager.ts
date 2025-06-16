@@ -8,6 +8,7 @@ import { AI } from "./ai";
 import { User } from "./entity/User";
 import { IsNull } from "typeorm";
 import { Queue } from "./queue";
+import { AmoCrm } from "./crm";
 
 interface GenerationJob {
   to: string;
@@ -26,6 +27,7 @@ interface MailingJob extends GenerationResult {
 const manager = AppDataSource.manager;
 
 export class Manager {
+  private crm: AmoCrm = new AmoCrm();
   private bot: TelegramBot = new TelegramBot(process.env.MANAGER_TOKEN!, {
     polling: true,
   });

@@ -1,11 +1,11 @@
 import axios, {Axios, AxiosResponse} from "axios";
 
 type CustomField = {
-    field_id: number;
-    field_name: string;
-    code?: string;
-    sort?: number;
-    type: string;
+    field_id: 193951 | 193947;
+    // field_name: 'NAZNACENIE' | 'NUMBER_PHONE';
+    // code?: 'NUMBER_PHONE';
+    // sort?: number;
+    // type: string;
     values: Array<object>;
 }
 
@@ -53,7 +53,19 @@ export interface IContactResponse {
     account_id: number;
 }
 
-export class AmoСrm {
+export interface ICreateDeal {
+    name?: string;
+    price?: number;
+    status_id?: number;
+    pipeline_id?: number;
+    custom_fields_values?: CustomField[];
+    tags_to_add?: {
+        id?: number,
+        name?: string
+    }[]
+}
+
+export class AmoCrm {
 
     constructor() {
     }
@@ -86,11 +98,72 @@ export class AmoСrm {
         return res.data
     }
 
-    public async AddContact(data: IAddContact): Promise<any> {
+    public async addContact(data: IAddContact): Promise<any> {
         const res = await axios.post('https://amocrm.ru/api/v4/contacts', data);
     }
 
-    public async UpdateContact(data: IUpdateContact): Promise<any> {
+    public async updateContact(data: IUpdateContact): Promise<any> {
         const res = await axios.patch('https://amocrm.ru/api/v4/contacts', data);
     }
+
+    public async addDeal(data: ICreateDeal[]): Promise<{
+        id: string
+    }> {
+        const res = await axios.post('https://plgmail.amocrm.ru/api/v4/leads', data, {
+            headers: {
+                Authorization: `Bearer ${process.env.AMO_TOKEN}`
+            }
+        });
+        return res.data;
+    }
+
+    public async getCustomFields(): Promise<{
+        _embedded: {
+            custom_fields: unknown[]
+        }
+    }> {
+        return (await axios.get('https://plgmail.amocrm.ru/api/v4/leads/custom_fields', {
+            headers: {
+                Authorization: `Bearer ${process.env.AMO_TOKEN}`
+            }
+        })).data;
+    }
+
+    public async getPipelines(): Promise<{
+        _embedded: {
+            pipelines: {
+                id: number,
+                name: string,
+                _embedded: {
+                    statuses: {
+                        id: number,
+                        name: string,
+                    }[]
+                }
+            }[]
+        }
+    }> {
+        return (await axios.get('https://plgmail.amocrm.ru/api/v4/leads/pipelines', {
+            headers: {
+                Authorization: `Bearer ${process.env.AMO_TOKEN}`
+            }
+        })).data;
+    }
+
+
+    public async getTags(): Promise<{
+        _embedded: {
+            tags: {
+                id: number,
+                name: string,
+            }[]
+        }
+    }> {
+        return (await axios.get('https://plgmail.amocrm.ru/api/v4/leads/tags', {
+                        headers: {
+                Authorization: `Bearer ${process.env.AMO_TOKEN}`
+            }
+        })).data;
+    }
+
 }

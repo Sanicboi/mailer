@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
 
-export class AI {
+class AI {
 
   private tools: OpenAI.Responses.Tool[] = [
     {
@@ -96,3 +96,4 @@ export class AI {
   }
 }
 
+export const ai = new AI();

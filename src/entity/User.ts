@@ -6,6 +6,7 @@ import {
   ManyToOne,
 } from "typeorm";
 import { Bot } from "./Bot";
+import { Mailing } from "./Mailing";
 
 @Entity()
 export class User {
@@ -34,4 +35,9 @@ export class User {
 
   @ManyToOne(() => Bot, (bot) => bot.users)
   bot: Bot;
+
+  @ManyToOne(() => Mailing, (mailing) => mailing.users, {
+    nullable: true
+  })
+  mailing: Mailing;
 }
