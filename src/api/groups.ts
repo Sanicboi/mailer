@@ -15,21 +15,16 @@ router.post(
     )
       return res.status(400).end();
     
-    const result = await AppDataSource
-        .createQueryBuilder()
-        .insert()
-        .into(BotGroup)
-        .values({
-            bots: req.body.map(el => {
-                const b = new Bot();
-                b.phone = el;
-                return b;
-            })
-        })
-        .execute();
+    const group = new BotGroup();
+    group.bots = req.body.map<Bot>(el => {
+        const b = new Bot();
+        b.phone = el;
+        return b
+    });
+    await manager.save(group);
     res.status(201).json({
-        id: result.identifiers[0]
-    })
+        id: group.id
+    });
   }
 );
 
