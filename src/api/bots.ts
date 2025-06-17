@@ -88,6 +88,9 @@ router.get("/api/bots/:phone", async (req, res): Promise<any> => {
     },
     where: {
       phone: req.params.phone
+    },
+    relations: {
+      group: true
     }
   });
   if (!bot) return res.status(404).end();
