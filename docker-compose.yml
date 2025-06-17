@@ -8,9 +8,11 @@ services:
       POSTGRES_PASSWORD: "test"
       POSTGRES_DB: "test"
   server:
+    restart: always
     build: .
     env_file: .env
   bot:
+    restart: always
     build: .
     command: "npm run bot"
     env_file: .env
