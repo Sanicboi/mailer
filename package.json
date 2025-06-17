@@ -35,6 +35,7 @@
     "parser": "ts-node src/parseContacts.ts",
     "puppeteer": "ts-node src/puppeteer.ts",
     "parse-all": "tsc && bun ./build/parseAll.js",
-    "test": "ts-node src/test.temp.ts"
+    "test": "ts-node src/test.temp.ts",
+    "bot": "ts-node src/botManager.ts"
   }
 }

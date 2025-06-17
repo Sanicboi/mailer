@@ -72,6 +72,9 @@ router.get("/api/bots", async (req, res) => {
       codeHash: false,
       token: false,
     },
+    relations: {
+      group: true,
+    }
   });
 
   res.status(200).json(bots);

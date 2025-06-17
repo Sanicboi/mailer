@@ -7,6 +7,10 @@ services:
       POSTGRES_USER: "test"
       POSTGRES_PASSWORD: "test"
       POSTGRES_DB: "test"
-  node:
+  server:
     build: .
+    env_file: .env
+  bot:
+    build: .
+    command: "npm run bot"
     env_file: .env
