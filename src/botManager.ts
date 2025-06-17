@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import TelegramBot from "node-telegram-bot-api";
 import { Bot } from "./entity/Bot";
 import { BotGroup } from "./entity/BotGroup";
-import 'dotenv/config';
+
 
 const bot = new TelegramBot(process.env.MANAGER_TOKEN!, {
   polling: true,

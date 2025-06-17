@@ -1,7 +1,5 @@
 import "dotenv/config";
 import { AppDataSource } from "./data-source";
-import { TelegramClient } from "telegram";
-import { Manager } from "./manager";
 import express from 'express';
 import botRouter from './api/bots';
 import exportsRouter from './api/exports';
