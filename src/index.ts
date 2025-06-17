@@ -6,11 +6,12 @@ import exportsRouter from './api/exports';
 import groupsRouter from './api/groups';
 import mailingsRouter from './api/mailings';
 import usersRouter from './api/users';
+import { init } from "./clients";
 
 AppDataSource.initialize()
   .then(async () => {
 
-
+    await init();
     const app = express();
 
     app.use(express.json());

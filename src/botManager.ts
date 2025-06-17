@@ -84,7 +84,10 @@ bot.onText(/\/addgroup/, async (msg) => {
     await bot.sendMessage(msg.from!.id, 'Пришлите мне номера ботов и нажмите стоп для сохранения.');
 });
 
-
+bot.onText(/\/mail /, async (msg) => {
+    const groupId = +msg.text!.split(' ')[1];
+    const res = await axios.post('/')
+})
 
 
 bot.onText(/./, async (msg) => {
