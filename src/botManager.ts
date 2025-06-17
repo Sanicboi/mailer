@@ -29,7 +29,7 @@ bot.onText(/^\/getbot /, async (msg) => {
     `
         Бот ${res.data.phone}
         Заблокирован: ${res.data.blocked}
-        ID партии: ${res.data.group.id}
+        ID партии: ${res.data.group?.id}
         Имя пользователя: ${res.data.username}
         `
   );
