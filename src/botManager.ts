@@ -3,7 +3,7 @@ import TelegramBot from "node-telegram-bot-api";
 import { Bot } from "./entity/Bot";
 import { BotGroup } from "./entity/BotGroup";
 
-const bot = new TelegramBot(process.env.TG_MANAGER_TOKEN!, {
+const bot = new TelegramBot(process.env.MANAGER_TOKEN!, {
   polling: true,
 });
 
