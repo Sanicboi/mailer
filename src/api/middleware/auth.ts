@@ -22,7 +22,7 @@ export const authorize = async (req: Req, res: e.Response, next: e.NextFunction)
     console.log("Starts with bearer");
     const token = header.split(' ')[1];
     if (!token) return res.status(401).end();
-    console.log("Has token")
+    console.log(token);
 
     try {
         console.log(process.env.JWT_KEY!);
