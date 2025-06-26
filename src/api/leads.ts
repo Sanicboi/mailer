@@ -7,11 +7,11 @@ import { Lead } from "../entities/lead";
 
 const router = e.Router();
 
-router.get('/bases/:baseId', async (req: Req, res): Promise<any> => {
+router.get('/bases/:id', async (req: Req, res): Promise<any> => {
     const base = await manager.find(LeadBase, {
         where: {
             user: req.user,
-            id: Number(req.params.baseId)
+            id: Number(req.params.id)
         },
         relations: {
             leads: true
@@ -79,6 +79,7 @@ router.post('/bases', async (req: Req<{
     leads: {
         username: string;
         data: string;
+        phone: string;
     }[]
 }>, res) => {
     try {
@@ -89,6 +90,7 @@ router.post('/bases', async (req: Req<{
             const lead = new Lead();
             lead.username = l.username;
             lead.data = l.data;
+            lead.phone = l.phone;
             await manager.save(lead)
             base.leads.push(lead);
         }

@@ -12,6 +12,11 @@ export class Lead {
     username: string;
 
     @Column({
+        nullable: true
+    })
+    phone: string;
+
+    @Column({
         default: ''
     })
     data: string;
@@ -19,12 +24,12 @@ export class Lead {
     @Column({
         default: false
     })
-    saved: boolean;
+    sent: boolean;
 
     @Column({
         nullable: true
     })
-    amoId: string;
+    amoId: number;
 
     @Column({
         nullable: true
