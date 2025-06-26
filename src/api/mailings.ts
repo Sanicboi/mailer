@@ -146,6 +146,8 @@ router.post(
       bots[i].mailings.push(mailing);
     }
 
+    console.log(bots);
+
     res.status(201).end();
 
     for (let i = 0; i < leads.length; i++) {
