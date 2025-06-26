@@ -178,6 +178,7 @@ router.post(
         });
         leads[i].previousResId = firstRes.id;
         leads[i].sent = true;
+        leads[i].bot = bots[botIdx];
         leads[i].amoId = (
           await amo.addDeal([
             {
