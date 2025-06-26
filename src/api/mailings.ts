@@ -1,169 +1,34 @@
 import e from "express";
-import { AppDataSource } from "../data-source";
-import { Mailing } from "../entity/Mailing";
-import { Bot } from "../entity/Bot";
-import { User } from "../entity/User";
-import { IsNull } from "typeorm";
+import { Req } from "./middleware/auth";
+import { manager } from "../db";
+import { Mailing } from "../entities/mailing";
+import { Bot } from "../entities/bot";
+import dayjs from "dayjs";
+import { IsNull, LessThan } from "typeorm";
+import { Lead } from "../entities/lead";
+import { LeadBase } from "../entities/leadBase";
 import { clients } from "../clients";
-import { ai } from "../ai";
+import { AI } from "../ai";
+import { amo } from "../crm";
+import { wait } from "../utils";
 
 const router = e.Router();
-const manager = AppDataSource.manager;
 
-const wait = async (s: number) => {
-  return await new Promise((resolve, reject) => setTimeout(resolve, 1000 * s));
-};
-
-router.post(
-  "/api/mailings",
-  async (
-    req: e.Request<
-      any,
-      any,
-      {
-        group?: number;
-        messagesPerBot?: number;
-      }
-    >,
-    res
-  ): Promise<any> => {
-    if (!req.body.group || typeof req.body.group !== "number")
-      return res.status(400).end();
-    if (!req.body.messagesPerBot || typeof req.body.messagesPerBot !== "number")
-      return res.status(400).end();
-
-    const groupBots = await manager.find(Bot, {
-      where: {
-        group: {
-          id: req.body.group,
-        },
-        loggedIn: true,
-        blocked: false,
-      },
-    });
-
-    const users = await manager.find(User, {
-      where: {
-        sent: false,
-        lastMsgId: IsNull(),
-      },
-      take: groupBots.length,
-    });
-
-    let mailing = new Mailing();
-    mailing.bots = groupBots;
-    mailing.users = users;
-    groupBots.forEach((b, idx) => groupBots[idx].mailings.push(mailing));
-    users.forEach((u, idx) => (users[idx].mailing = mailing));
-
-    res.status(201).json({
-      id: mailing.id,
-    });
-
-    let promises: Promise<void>[] = [];
-    for (let i = 0; i < groupBots.length; i++) {
-      promises.push(
-        (async () => {
-          if (!req.body.messagesPerBot) return;
-          const client = clients.get(groupBots[i].phone);
-          if (!client) return;
-          for (let k = 0; k < req.body.messagesPerBot; k++) {
-            mailing = (await manager.findOne(Mailing, {
-              where: {
-                id: mailing.id,
-              },
-            }))!;
-            if (!mailing.active) return;
-            const message = await ai.createFirstMessage(
-              users[i * req.body.messagesPerBot + k].additionalData
-            );
-            try {
-              await client.sendMessage(
-                users[i * req.body.messagesPerBot + k].username,
-                {
-                  message: message.text,
-                }
-              );
-              users[i * req.body.messagesPerBot + k].lastMsgId = message.id;
-              users[i * req.body.messagesPerBot + k].sent = true;
-              users[i * req.body.messagesPerBot + k].bot = groupBots[i];
-              await manager.save(users[i * req.body.messagesPerBot + k]);
-            } catch (error) {
-              console.error(error);
-            } finally {
-              await wait(4 * 60);
-            }
-          }
-        })()
-      );
-    }
-
-    await Promise.all(promises);
-  }
-);
-
-router.put("/api/mailings/:id/stop", async (req, res) => {
-  try {
-    await manager
-      .createQueryBuilder()
-      .update(Mailing)
-      .set({ active: false })
-      .where("id = :id", {
-        id: +req.params.id,
-      })
-      .execute();
-    res.status(204).end();
-  } catch (error) {
-    res.status(404).end();
-  }
-});
-
-router.get("/api/mailings", async (req, res) => {
-  const mailings = await manager.find(Mailing, {
-    relations: {
-      bots: true,
-      users: {
-        bot: true,
-      },
-    },
-    select: {
-      bots: {
-        codeHash: false,
-        token: false,
-      },
-      users: {
-        bot: {
-          codeHash: false,
-          token: false,
-        },
-      },
-    },
-  });
-
-  res.status(200).json(mailings);
-});
-
-router.get("/api/mailings/:id", async (req, res): Promise<any> => {
+router.get("/:id", async (req: Req, res): Promise<any> => {
   const mailing = await manager.findOne(Mailing, {
     where: {
-      id: +req.params.id,
+      user: req.user,
+      id: Number(req.params.id),
     },
     relations: {
       bots: true,
-      users: {
-        bot: true,
-      },
+      leadBase: true,
+      leads: true,
     },
     select: {
       bots: {
         codeHash: false,
         token: false,
-      },
-      users: {
-        bot: {
-          codeHash: false,
-          token: false,
-        },
       },
     },
   });
@@ -171,5 +36,179 @@ router.get("/api/mailings/:id", async (req, res): Promise<any> => {
   if (!mailing) return res.status(404).end();
   res.status(200).json(mailing);
 });
+
+router.get("/", async (req: Req, res) => {
+  const mailings = await manager.find(Mailing, {
+    where: {
+      user: req.user,
+    },
+    relations: {
+      bots: true,
+      leadBase: true,
+      leads: true,
+    },
+    select: {
+      bots: {
+        codeHash: false,
+        token: false,
+      },
+    },
+  });
+
+  res.status(200).json(mailings);
+});
+
+router.post(
+  "/evaluation",
+  async (
+    req: Req<{
+      amount: number;
+      baseId: number;
+    }>,
+    res
+  ) => {
+    if (!req.user) return;
+    if (!req.user) return;
+    // Determine the amount of accounts available/necessary
+    const N = 15;
+    const barrier = dayjs().subtract(2, "days").toDate();
+    const max = Math.ceil(req.body.amount / N);
+    const bots = await manager.find(Bot, {
+      where: {
+        user: req.user,
+        blocked: false,
+        lastMessage: LessThan(barrier),
+      },
+      take: max,
+      order: {
+        lastMessage: "ASC",
+      },
+    });
+    let isEnough: boolean = bots.length === max;
+    res.status(200).json({
+      enough: isEnough
+    })
+  }
+);
+
+router.post(
+  "/",
+  async (
+    req: Req<{
+      amount: number;
+      baseId: number;
+    }>,
+    res
+  ): Promise<any> => {
+    if (!req.user) return;
+    // Determine the amount of accounts available/necessary
+    const N = 15;
+    const barrier = dayjs().subtract(2, "days").toDate();
+    const max = Math.ceil(req.body.amount / N);
+    const bots = await manager.find(Bot, {
+      where: {
+        user: req.user,
+        blocked: false,
+        lastMessage: LessThan(barrier),
+      },
+      take: max,
+      order: {
+        lastMessage: "ASC",
+      },
+    });
+    let isEnough: boolean = bots.length === max;
+    const leads = await manager.find(Lead, {
+      where: {
+        user: req.user,
+        previousResId: IsNull(),
+        leadBase: {
+          id: req.body.baseId,
+        },
+      },
+      take: bots.length * N,
+    });
+
+    if (leads.length === 0) return res.status(404).end();
+
+    let mailing: Mailing | null = new Mailing();
+    mailing.leadBase = new LeadBase();
+    mailing.leadBase.id = req.body.baseId;
+    mailing.user = req.user;
+    mailing.bots = bots;
+    mailing.leads = leads;
+    await manager.save(mailing);
+
+    for (let i = 0; i < leads.length; i++) {
+      leads[i].mailing = mailing;
+    }
+
+    for (let i = 0; i < bots.length; i++) {
+      bots[i].mailings.push(mailing);
+    }
+
+    res.status(201).json({
+      isEnough,
+      bots,
+      leads,
+    });
+
+    for (let i = 0; i < leads.length; i++) {
+      mailing = await manager.findOneBy(Mailing, {
+        id: mailing?.id,
+      });
+      if (!mailing) break;
+      if (!mailing.active) {
+        break;
+      }
+      const botIdx = i % bots.length;
+      const client = clients.get(bots[botIdx].phone);
+      if (!client) continue;
+
+      const ai = new AI(req.user.prompt);
+      const firstRes = await ai.createFirstMessage(leads[i].data);
+      try {
+        if (dayjs().subtract(4, "minutes").isBefore(bots[botIdx].lastMessage)) {
+          await wait(dayjs().diff(bots[botIdx].lastMessage, "s"));
+        }
+        bots[botIdx].lastMessage = new Date();
+        await manager.save(bots[botIdx]);
+
+        await client.sendMessage(leads[i].username, {
+          message: firstRes.text,
+        });
+        leads[i].previousResId = firstRes.id;
+        leads[i].sent = true;
+        leads[i].amoId = (
+          await amo.addDeal([
+            {
+              pipeline_id: 9442090,
+              status_id: 77868898,
+              custom_fields_values: [
+                {
+                  field_id: 193951,
+                  values: [
+                    {
+                      value: leads[i].phone,
+                    },
+                  ],
+                },
+                {
+                  field_id: 758241,
+                  values: [
+                    {
+                      value: leads[i].username,
+                    },
+                  ],
+                },
+              ],
+              name: leads[i].username,
+            },
+          ])
+        ).id;
+        await manager.save(leads[i]);
+      } catch (error) {}
+    }
+  }
+);
 
 export default router;

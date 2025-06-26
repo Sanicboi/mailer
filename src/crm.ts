@@ -1,63 +1,18 @@
 import axios, {Axios, AxiosResponse} from "axios";
 
 type CustomField = {
-    field_id: 193951 | 193947;
-    // field_name: 'NAZNACENIE' | 'NUMBER_PHONE';
-    // code?: 'NUMBER_PHONE';
-    // sort?: number;
-    // type: string;
-    values: Array<object>;
+    field_id: 193951 | 758239 | 758241;
+    values: {
+        value: string
+    }[];
 }
 
-export interface IAddContact {
-    name: string;
-    first_name: string;
-    last_name: string;
-    responsible_user_id: number;
-    created_by?: number;
-    updated_by?: number;
-    created_at?: number;
-    updated_at?: number;
-    custom_fields_values?: Array<CustomField>;
-    tags_to_add?: Array<object>;
-}
-
-export interface IUpdateContact {
-    id: number;
-    name: string;
-    first_name: string;
-    last_name: string;
-    responsible_user_id: number;
-    created_by?: number;
-    updated_by?: number;
-    created_at?: number;
-    updated_at?: number;
-    custom_fields_values?: Array<CustomField>;
-    tags_to_add?: Array<object>;
-    tags_to_delete?: Array<object>;
-}
-
-export interface IContactResponse {
-    name: string;
-    first_name: string;
-    last_name: string;
-    responsible_user_id: number;
-    group_id: number;
-    created_by: number;
-    updated_by: number;
-    created_at: number;
-    updated_at: number;
-    is_deleted: boolean;
-    closest_task_at: number;
-    custom_fields_values: Array<CustomField>;
-    account_id: number;
-}
 
 export interface ICreateDeal {
     name?: string;
     price?: number;
-    status_id?: number;
-    pipeline_id?: number;
+    status_id: 77868898;
+    pipeline_id: 9442090;
     custom_fields_values?: CustomField[];
     tags_to_add?: {
         id?: number,
@@ -65,49 +20,13 @@ export interface ICreateDeal {
     }[]
 }
 
-export class AmoCrm {
+class AmoCrm {
 
     constructor() {
     }
 
-    public async getContacts(): Promise<IContactResponse[]> {
-        const res: AxiosResponse<{
-            _page: number;
-            _links: object;
-            _embedded: {
-                contacts: Array<IContactResponse>
-            }
-        }> = await axios.get('https://amocrm.ru/api/v4/contacts', {
-            headers: {
-                
-            }
-        });
-
-        let arr: (IContactResponse)[] = []
-        arr = arr.concat(res.data._embedded.contacts.map<IContactResponse>(el => {
-            return {
-                ...el
-            }
-        }));
-
-        return arr;
-    }
-
-    public async getContact(id: string): Promise<IContactResponse> {
-        const res: AxiosResponse<IContactResponse> = await axios.get(`https://amocrm.ru/api/v4/contacts/${id}`)
-        return res.data
-    }
-
-    public async addContact(data: IAddContact): Promise<any> {
-        const res = await axios.post('https://amocrm.ru/api/v4/contacts', data);
-    }
-
-    public async updateContact(data: IUpdateContact): Promise<any> {
-        const res = await axios.patch('https://amocrm.ru/api/v4/contacts', data);
-    }
-
     public async addDeal(data: ICreateDeal[]): Promise<{
-        id: string
+        id: number
     }> {
         const res = await axios.post('https://plgmail.amocrm.ru/api/v4/leads', data, {
             headers: {
@@ -117,9 +36,33 @@ export class AmoCrm {
         return res.data;
     }
 
+    public async editDeal(data: {
+        id: number,
+        /**
+         * China/Not China/Not WB
+         */
+        status_id: 77868902 | 77868906 | 77868910,
+        custom_fileds_values: {
+            field_id: 758239,
+            values: {
+                value: string
+            }[]
+        }[]
+    }) {
+        await axios.patch('https://plgmail.amocrm.ru/api/v4/leads', {
+            headers: {
+                Authorization: `Bearer ${process.env.AMO_TOKEN}`
+            }
+        });
+    }
+
     public async getCustomFields(): Promise<{
         _embedded: {
-            custom_fields: unknown[]
+            custom_fields: {
+                id: number,
+                name: string,
+                type: string,
+            }[]
         }
     }> {
         return (await axios.get('https://plgmail.amocrm.ru/api/v4/leads/custom_fields', {
@@ -167,3 +110,5 @@ export class AmoCrm {
     }
 
 }
+
+export const amo = new AmoCrm();

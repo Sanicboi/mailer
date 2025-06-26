@@ -1,21 +1,20 @@
 import { Api, TelegramClient } from "telegram";
-import { AppDataSource } from "./data-source";
-import { Bot } from "./entity/Bot";
 import { StringSession } from "telegram/sessions";
 import { NewMessage, NewMessageEvent } from "telegram/events";
-import { ai } from "./ai";
+import { manager } from "./db";
+import { Bot } from "./entities/bot";
+import { AI } from "./ai";
 
-const manager = AppDataSource.manager;
 export const clients = new Map<string, TelegramClient>();
 
-const callback = async (e: NewMessageEvent, client: TelegramClient) => {
+const callback = async (e: NewMessageEvent, client: TelegramClient, ai: AI) => {
   const me = await client.getMe();
   const bot = await manager.findOne(Bot, {
     where: {
       phone: me.phone,
     },
     relations: {
-      users: true,
+      leads: true,
     },
   });
   if (!bot) return;
@@ -28,29 +27,29 @@ const callback = async (e: NewMessageEvent, client: TelegramClient) => {
   if (!dialog) return;
   const entity = dialog.entity as Api.User;
 
-  const user = bot.users.find((el) => el.username === entity.username);
-  if (!user) return;
+  const lead = bot.leads.find((el) => el.username === entity.username);
+  if (!lead) return;
 
-  if (!user.replied) {
-    user.replied = true;
+  if (!lead.replied) {
+    lead.replied = true;
   }
 
   await client.invoke(
     new Api.messages.ReadHistory({
-      peer: user.username,
+      peer: lead.username,
     })
   );
   await client.invoke(
     new Api.messages.SetTyping({
-      peer: user.username,
+      peer: lead.username,
       action: new Api.SendMessageTypingAction(),
     })
   );
   await new Promise((res, rej) => setTimeout(res, 1000 * 5));
-  const res = await ai.respond(e.message.text, user.lastMsgId!, me.firstName!);
-  user.lastMsgId = res.id;
-  await manager.save(user);
-  await client.sendMessage(user.username, {
+  const res = await ai.respond(e.message.text, lead.previousResId, me.firstName!);
+  lead.previousResId = res.id;
+  await manager.save(lead);
+  await client.sendMessage(lead.username, {
     message: res.text,
   });
 };
@@ -59,8 +58,11 @@ export const init = async () => {
   const bots = await manager.find(Bot, {
     where: {
       blocked: false,
-      loggedIn: true,
+      loggedIn: true
     },
+    relations: {
+        user: true
+    }
   });
   for (const bot of bots) {
     const session = new StringSession(bot.token);
@@ -74,7 +76,7 @@ export const init = async () => {
     await client.connect();
     client.addEventHandler(async (e: NewMessageEvent) => {
       if (e.isPrivate) {
-        await callback(e, client);
+        await callback(e, client, new AI(bot.user.prompt));
       }
     }, new NewMessage());
   }
@@ -106,7 +108,7 @@ export const sendCode = async (bot: Bot) => {
   clients.set(bot.phone, client);
   client.addEventHandler(async (e: NewMessageEvent) => {
     if (e.isPrivate) {
-      await callback(e, client);
+      await callback(e, client, new AI(bot.user.prompt));
     }
   }, new NewMessage());
 };
@@ -127,7 +129,6 @@ export const login = async (bot: Bot, code: string) => {
 
   bot.loggedIn = true;
   bot.codeHash = "";
-  bot.username = String(me.username);
   await manager.save(bot);
 };
 

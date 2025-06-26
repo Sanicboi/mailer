@@ -1,8 +1,6 @@
 import OpenAI from "openai";
-import fs from "fs";
-import path from "path";
 
-class AI {
+export class AI {
 
   private tools: OpenAI.Responses.Tool[] = [
     {
@@ -36,13 +34,8 @@ class AI {
   private openai = new OpenAI({
     apiKey: process.env.OPENAI_TOKEN,
   });
-  private readonly prompt: string = fs.readFileSync(
-    path.join(process.cwd(), "prompt.txt"),
-    "utf-8",
-  );
 
-  constructor() {
-    console.log(this.prompt);
+  constructor(private readonly prompt: string) {
   }
 
   public async createFirstMessage(data: string): Promise<{
@@ -95,5 +88,3 @@ class AI {
     };
   }
 }
-
-export const ai = new AI();
