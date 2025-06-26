@@ -74,18 +74,17 @@ router.post(
     const barrier = dayjs().subtract(2, "days").toDate();
     const max = Math.ceil(req.body.amount / N);
     console.log(max);
-    const bots = await manager.find(Bot, {
+    let bots = await manager.find(Bot, {
       where: {
         user: req.user,
         blocked: false,
-        lastMessage: Or(LessThan(barrier), IsNull()),
       },
       take: max,
       order: {
         lastMessage: "ASC",
       },
     });
-    console.log(bots);
+    bots = bots.filter(el => !el.lastMessage || dayjs(el.lastMessage).isBefore(barrier));
     let isEnough: boolean = bots.length === max;
     res.status(200).json({
       enough: isEnough
