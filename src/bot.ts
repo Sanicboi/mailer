@@ -25,7 +25,7 @@ bot.setMyCommands([
 ]);
 
 bot.onText(/\/mail/, async (msg) => {
-  const bases: AxiosResponse<LeadBase[]> = await axios.get("/api/bases");
+  const bases: AxiosResponse<LeadBase[]> = await axios.get("/api/leads/bases");
   await bot.sendMessage(msg.from!.id, "Выберите клиентскую базу для рассылки", {
     reply_markup: {
       inline_keyboard: bases.data.map<InlineKeyboardButton[]>((el) => [
