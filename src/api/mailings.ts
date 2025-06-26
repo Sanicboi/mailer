@@ -4,7 +4,7 @@ import { manager } from "../db";
 import { Mailing } from "../entities/mailing";
 import { Bot } from "../entities/bot";
 import dayjs from "dayjs";
-import { IsNull, LessThan } from "typeorm";
+import { IsNull, LessThan, Or } from "typeorm";
 import { Lead } from "../entities/lead";
 import { LeadBase } from "../entities/leadBase";
 import { clients } from "../clients";
@@ -73,17 +73,19 @@ router.post(
     const N = 15;
     const barrier = dayjs().subtract(2, "days").toDate();
     const max = Math.ceil(req.body.amount / N);
+    console.log(max);
     const bots = await manager.find(Bot, {
       where: {
         user: req.user,
         blocked: false,
-        lastMessage: LessThan(barrier),
+        lastMessage: Or(LessThan(barrier), IsNull()),
       },
       take: max,
       order: {
         lastMessage: "ASC",
       },
     });
+    console.log(bots);
     let isEnough: boolean = bots.length === max;
     res.status(200).json({
       enough: isEnough
