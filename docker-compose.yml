@@ -11,6 +11,8 @@ services:
     restart: always
     build: .
     env_file: .env
+    ports:
+      - 88:80
     volumes:
       - ~/mailer-data:/var/lib/postgresql/data:rw
   bot:
