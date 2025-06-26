@@ -45,18 +45,18 @@ bot.on("callback_query", async (q) => {
     waiter = "amount";
     await bot.sendMessage(
       q.from!.id,
-      "Введите необходимое количество сообщений"
+      "Введите необходимое количество сообщений",
     );
   }
 
-  if (q.data?.startsWith('launch-')) {
+  if (q.data?.startsWith("launch-")) {
     const baseId = Number(q.data.split("-")[1]);
     const amount = Number(q.data.split("-")[2]);
-    await axios.post('/api/mailings', {
-        baseId,
-        amount
+    await axios.post("/api/mailings", {
+      baseId,
+      amount,
     });
-    await bot.sendMessage(q.from.id, 'Рассылка запущена');
+    await bot.sendMessage(q.from.id, "Рассылка запущена");
   }
 });
 
@@ -73,19 +73,18 @@ bot.onText(/./, async (msg) => {
     // if (!evaluation.data.enough) {
     //     return await bot.sendMessage(msg.from.id, 'Для такого объема нехватает аккаунтов');
     // }
-    await bot.sendMessage(msg.from.id, 'Объем выполнить возможно!', {
-        reply_markup: {
-            inline_keyboard: [
-                [
-                    {
-                        text: 'Запустить',
-                        callback_data: `launch-${baseId}-${Number(msg.text)}`
-                    }
-                ]
-            ]
-        }
-    })
+    await bot.sendMessage(msg.from.id, "Объем выполнить возможно!", {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: "Запустить",
+              callback_data: `launch-${baseId}-${Number(msg.text)}`,
+            },
+          ],
+        ],
+      },
+    });
     baseId = null;
   }
 });
-

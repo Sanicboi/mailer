@@ -1,47 +1,51 @@
-import { Column, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+} from "typeorm";
 import { User } from "./user";
 import { Mailing } from "./mailing";
 import { Lead } from "./lead";
 
-
-
 @Entity()
 export class Bot {
-    @PrimaryColumn()
-    phone: string;
+  @PrimaryColumn()
+  phone: string;
 
-    @Column({
-        nullable: true
-    })
-    token: string;
-    
-    @Column({
-        default: false
-    })
-    blocked: boolean;
+  @Column({
+    nullable: true,
+  })
+  token: string;
 
-    @Column({
-        nullable: true
-    })
-    lastMessage: Date;
+  @Column({
+    default: false,
+  })
+  blocked: boolean;
 
-    @Column({
-        default: false
-    })
-    loggedIn: boolean;
+  @Column({
+    nullable: true,
+  })
+  lastMessage: Date;
 
-    @Column({
-        default: ''
-    })
-    codeHash: string;
+  @Column({
+    default: false,
+  })
+  loggedIn: boolean;
 
-    @ManyToOne(() => User, (user) => user.bots)
-    user: User;
+  @Column({
+    default: "",
+  })
+  codeHash: string;
 
-    @ManyToMany(() => Mailing, (mailing) => mailing.bots)
-    mailings: Mailing[];
-    
+  @ManyToOne(() => User, (user) => user.bots)
+  user: User;
 
-    @OneToMany(() => Lead, (lead) => lead.bot)
-    leads: Lead[];
+  @ManyToMany(() => Mailing, (mailing) => mailing.bots)
+  mailings: Mailing[];
+
+  @OneToMany(() => Lead, (lead) => lead.bot)
+  leads: Lead[];
 }

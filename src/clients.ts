@@ -22,7 +22,7 @@ const callback = async (e: NewMessageEvent, client: TelegramClient, ai: AI) => {
   const dialog = dialogs.find(
     (el) =>
       el.entity?.className === "User" &&
-      el.entity.id.toJSON() === e.message.senderId?.toJSON()
+      el.entity.id.toJSON() === e.message.senderId?.toJSON(),
   );
   if (!dialog) return;
   const entity = dialog.entity as Api.User;
@@ -37,16 +37,20 @@ const callback = async (e: NewMessageEvent, client: TelegramClient, ai: AI) => {
   await client.invoke(
     new Api.messages.ReadHistory({
       peer: lead.username,
-    })
+    }),
   );
   await client.invoke(
     new Api.messages.SetTyping({
       peer: lead.username,
       action: new Api.SendMessageTypingAction(),
-    })
+    }),
   );
   await new Promise((res, rej) => setTimeout(res, 1000 * 5));
-  const res = await ai.respond(e.message.text, lead.previousResId, me.firstName!);
+  const res = await ai.respond(
+    e.message.text,
+    lead.previousResId,
+    me.firstName!,
+  );
   lead.previousResId = res.id;
   await manager.save(lead);
   await client.sendMessage(lead.username, {
@@ -58,11 +62,11 @@ export const init = async () => {
   const bots = await manager.find(Bot, {
     where: {
       blocked: false,
-      loggedIn: true
+      loggedIn: true,
     },
     relations: {
-        user: true
-    }
+      user: true,
+    },
   });
   for (const bot of bots) {
     const session = new StringSession(bot.token);
@@ -70,7 +74,7 @@ export const init = async () => {
       session,
       +process.env.TG_API_ID!,
       process.env.TG_API_HASH!,
-      {}
+      {},
     );
     clients.set(bot.phone, client);
     await client.connect();
@@ -92,7 +96,7 @@ export const sendCode = async (bot: Bot) => {
     new StringSession(),
     +process.env.TG_API_ID!,
     process.env.TG_API_HASH!,
-    {}
+    {},
   );
 
   await client.connect();
@@ -101,7 +105,7 @@ export const sendCode = async (bot: Bot) => {
   const sendCodeResult = await client.sendCode(
     apiCredentials,
     bot.phone,
-    false
+    false,
   );
   bot.codeHash = sendCodeResult.phoneCodeHash;
   await manager.save(bot);
@@ -122,7 +126,7 @@ export const login = async (bot: Bot, code: string) => {
       phoneCode: code,
       phoneCodeHash: bot.codeHash,
       phoneNumber: bot.phone,
-    })
+    }),
   );
 
   const me = await client.getMe();
@@ -134,7 +138,7 @@ export const login = async (bot: Bot, code: string) => {
 
 export const getDialog = async (
   username: string,
-  phone: string
+  phone: string,
 ): Promise<
   {
     role: "user" | "ai";

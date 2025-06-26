@@ -100,7 +100,7 @@ router.post(
       amount: number;
       baseId: number;
     }>,
-    res
+    res,
   ): Promise<any> => {
     if (!req.user) return;
     // Determine the amount of accounts available/necessary
@@ -146,11 +146,7 @@ router.post(
       bots[i].mailings.push(mailing);
     }
 
-    res.status(201).json({
-      // isEnough,
-      bots,
-      leads,
-    });
+    res.status(201).json(mailing);
 
     for (let i = 0; i < leads.length; i++) {
       mailing = await manager.findOneBy(Mailing, {
@@ -209,7 +205,7 @@ router.post(
         await manager.save(leads[i]);
       } catch (error) {}
     }
-  }
+  },
 );
 
 export default router;

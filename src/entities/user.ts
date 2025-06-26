@@ -4,38 +4,35 @@ import { Mailing } from "./mailing";
 import { Lead } from "./lead";
 import { LeadBase } from "./leadBase";
 
-
 @Entity()
 export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
 
+  @Column({
+    nullable: true,
+  })
+  name: string;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @OneToMany(() => Bot, (bot) => bot.user)
+  bots: Bot[];
 
-    @Column({
-        nullable: true
-    })
-    name: string;
+  @OneToMany(() => Mailing, (mailing) => mailing.user)
+  mailings: Mailing[];
 
-    @OneToMany(() => Bot, (bot) => bot.user)
-    bots: Bot[];
+  @OneToMany(() => Lead, (lead) => lead.user)
+  leads: Lead[];
 
-    @OneToMany(() => Mailing, (mailing) => mailing.user)
-    mailings: Mailing[];
+  @OneToMany(() => LeadBase, (leadBase) => leadBase.user)
+  leadBases: LeadBase[];
 
-    @OneToMany(() => Lead, (lead) => lead.user)
-    leads: Lead[];
+  @Column("text", {
+    default: "",
+  })
+  prompt: string;
 
-    @OneToMany(() => LeadBase, (leadBase) => leadBase.user)
-    leadBases: LeadBase[];
-
-    @Column('text', {
-        default: ''
-    })
-    prompt: string;
-
-    @Column('bytea', {
-        default: Buffer.from('')
-    })
-    kb: Buffer;
+  @Column("bytea", {
+    default: Buffer.from(""),
+  })
+  kb: Buffer;
 }

@@ -3,21 +3,17 @@ import { Lead } from "./lead";
 import { User } from "./user";
 import { Mailing } from "./mailing";
 
-
 @Entity()
 export class LeadBase {
+  @PrimaryGeneratedColumn()
+  id: number;
 
+  @OneToMany(() => Lead, (lead) => lead.leadBase)
+  leads: Lead[];
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @ManyToOne(() => User, (user) => user.leadBases)
+  user: User;
 
-
-    @OneToMany(() => Lead, (lead) => lead.leadBase)
-    leads: Lead[];
-
-    @ManyToOne(() => User, (user) => user.leadBases)
-    user: User;
-
-    @OneToMany(() => Mailing, (mailing) => mailing.leadBase)
-    mailings: Mailing[];
+  @OneToMany(() => Mailing, (mailing) => mailing.leadBase)
+  mailings: Mailing[];
 }
