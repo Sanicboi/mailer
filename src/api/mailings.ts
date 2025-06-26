@@ -146,7 +146,7 @@ router.post(
       bots[i].mailings.push(mailing);
     }
 
-    res.status(201).json(mailing);
+    res.status(201).end();
 
     for (let i = 0; i < leads.length; i++) {
       mailing = await manager.findOneBy(Mailing, {
