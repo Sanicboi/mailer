@@ -64,15 +64,15 @@ bot.onText(/./, async (msg) => {
   if (!msg.from) return;
   if (waiter === "amount") {
     waiter = "";
-    const evaluation: AxiosResponse<{
-      enough: boolean;
-    }> = await axios.post("/api/mailings/evaluation", {
-        baseId,
-        amount: Number(msg.text)
-    });
-    if (!evaluation.data.enough) {
-        return await bot.sendMessage(msg.from.id, 'Для такого объема нехватает аккаунтов');
-    }
+    // const evaluation: AxiosResponse<{
+    //   enough: boolean;
+    // }> = await axios.post("/api/mailings/evaluation", {
+    //     baseId,
+    //     amount: Number(msg.text)
+    // });
+    // if (!evaluation.data.enough) {
+    //     return await bot.sendMessage(msg.from.id, 'Для такого объема нехватает аккаунтов');
+    // }
     await bot.sendMessage(msg.from.id, 'Объем выполнить возможно!', {
         reply_markup: {
             inline_keyboard: [

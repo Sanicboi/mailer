@@ -58,40 +58,40 @@ router.get("/", async (req: Req, res) => {
   res.status(200).json(mailings);
 });
 
-router.post(
-  "/evaluation",
-  async (
-    req: Req<{
-      amount: number;
-      baseId: number;
-    }>,
-    res
-  ) => {
-    if (!req.user) return;
-    if (!req.user) return;
-    // Determine the amount of accounts available/necessary
-    const N = 15;
-    const barrier = dayjs().subtract(2, "days").toDate();
-    const max = Math.ceil(req.body.amount / N);
-    console.log(max);
-    let bots = await manager.find(Bot, {
-      where: {
-        user: req.user,
-        blocked: false,
-      },
-      take: max,
-      order: {
-        lastMessage: "ASC",
-      },
-    });
-    bots = bots.filter(el => !el.lastMessage || dayjs(el.lastMessage).isBefore(barrier));
-    console.log(bots);
-    let isEnough: boolean = bots.length === max;
-    res.status(200).json({
-      enough: isEnough
-    })
-  }
-);
+// router.post(
+//   "/evaluation",
+//   async (
+//     req: Req<{
+//       amount: number;
+//       baseId: number;
+//     }>,
+//     res
+//   ) => {
+//     if (!req.user) return;
+//     if (!req.user) return;
+//     // Determine the amount of accounts available/necessary
+//     const N = 15;
+//     const barrier = dayjs().subtract(2, "days").toDate();
+//     const max = Math.ceil(req.body.amount / N);
+//     console.log(max);
+//     let bots = await manager.find(Bot, {
+//       where: {
+//         user: req.user,
+//         blocked: false,
+//       },
+//       take: max,
+//       order: {
+//         lastMessage: "ASC",
+//       },
+//     });
+//     // bots = bots.filter(el => !el.lastMessage || dayjs(el.lastMessage).isBefore(barrier));
+//     console.log(bots);
+//     let isEnough: boolean = bots.length === max;
+//     res.status(200).json({
+//       enough: isEnough
+//     })
+//   }
+// );
 
 router.post(
   "/",
@@ -105,20 +105,18 @@ router.post(
     if (!req.user) return;
     // Determine the amount of accounts available/necessary
     const N = 15;
-    const barrier = dayjs().subtract(2, "days").toDate();
-    const max = Math.ceil(req.body.amount / N);
-    const bots = await manager.find(Bot, {
+    // const barrier = dayjs().subtract(2, "days").toDate();
+    // const max = Math.ceil(req.body.amount / N);
+    let bots = await manager.find(Bot, {
       where: {
         user: req.user,
         blocked: false,
-        lastMessage: LessThan(barrier),
       },
-      take: max,
+      take: req.body.amount,
       order: {
         lastMessage: "ASC",
       },
     });
-    let isEnough: boolean = bots.length === max;
     const leads = await manager.find(Lead, {
       where: {
         user: req.user,
@@ -149,7 +147,7 @@ router.post(
     }
 
     res.status(201).json({
-      isEnough,
+      // isEnough,
       bots,
       leads,
     });
