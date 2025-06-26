@@ -1,4 +1,9 @@
 import { DataSource } from "typeorm";
+import { Bot } from "./entities/bot";
+import { Lead } from "./entities/lead";
+import { LeadBase } from "./entities/leadBase";
+import { User } from "./entities/user";
+import { Mailing } from "./entities/mailing";
 
 
 export const db = new DataSource({
@@ -7,7 +12,7 @@ export const db = new DataSource({
     password: 'test',
     database: 'test',
     entities: [
-
+        Bot, Lead, LeadBase, User, Mailing
     ],
     host: 'postgres',
     port: 5432,
