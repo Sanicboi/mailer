@@ -85,6 +85,7 @@ router.post(
       },
     });
     bots = bots.filter(el => !el.lastMessage || dayjs(el.lastMessage).isBefore(barrier));
+    console.log(bots);
     let isEnough: boolean = bots.length === max;
     res.status(200).json({
       enough: isEnough
