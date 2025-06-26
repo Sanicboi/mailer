@@ -29,7 +29,7 @@ export class User {
     @OneToMany(() => LeadBase, (leadBase) => leadBase.user)
     leadBases: LeadBase[];
 
-    @Column('longtext', {
+    @Column('text', {
         default: ''
     })
     prompt: string;
