@@ -25,6 +25,7 @@ export const authorize = async (req: Req, res: e.Response, next: e.NextFunction)
     console.log("Has token")
 
     try {
+        console.log(process.env.JWT_KEY!);
         const verified: string | AuthPayload = jwt.verify(token, process.env.JWT_KEY!);
         console.log("Verified")
         if (typeof verified === 'string') return res.status(401).end();
