@@ -11,7 +11,8 @@ export const db = new DataSource({
     ],
     host: 'postgres',
     port: 5432,
-    logging: true
+    logging: true,
+    synchronize: true
 })
 
 export const manager = db.manager;
