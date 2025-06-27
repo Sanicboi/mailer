@@ -116,6 +116,9 @@ router.post(
       order: {
         lastMessage: "ASC",
       },
+      relations: {
+        mailings: true
+      }
     });
     const leads = await manager.find(Lead, {
       where: {
@@ -141,7 +144,7 @@ router.post(
     for (let i = 0; i < leads.length; i++) {
       leads[i].mailing = mailing;
     }
-
+    
     for (let i = 0; i < bots.length; i++) {
       bots[i].mailings.push(mailing);
     }
