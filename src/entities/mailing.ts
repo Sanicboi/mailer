@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -29,6 +30,7 @@ export class Mailing {
   user: User;
 
   @OneToMany(() => Lead, (lead) => lead.mailing)
+  @JoinTable()
   leads: Lead[];
 
   @ManyToOne(() => LeadBase, (leadBase) => leadBase.mailings)
