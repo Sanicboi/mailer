@@ -24,13 +24,13 @@ export class Mailing {
   active: boolean;
 
   @ManyToMany(() => Bot, (bot) => bot.mailings)
+  @JoinTable()
   bots: Bot[];
 
   @ManyToOne(() => User, (user) => user.mailings)
   user: User;
 
   @OneToMany(() => Lead, (lead) => lead.mailing)
-  @JoinTable()
   leads: Lead[];
 
   @ManyToOne(() => LeadBase, (leadBase) => leadBase.mailings)
