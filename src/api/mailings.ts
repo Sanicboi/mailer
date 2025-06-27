@@ -163,12 +163,16 @@ router.post(
       if (!client) continue;
 
       const ai = new AI(req.user.prompt);
-      const firstRes = await ai.createFirstMessage(leads[i].data);
+      const firstRes = /*await ai.createFirstMessage(leads[i].data)*/ {
+        id: 'abcdefg',
+        text: 'dafcgc'
+      };
       try {
         if (dayjs().subtract(4, "minutes").isBefore(bots[botIdx].lastMessage)) {
           await wait(dayjs().diff(bots[botIdx].lastMessage, "s"));
         }
         bots[botIdx].lastMessage = new Date();
+        console.log(bots[botIdx]);
         await manager.save(bots[botIdx]);
 
         await client.sendMessage(leads[i].username, {
