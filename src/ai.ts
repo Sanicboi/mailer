@@ -9,34 +9,6 @@ const Determination = z.object({
 
 
 export class AI {
-  private tools: OpenAI.Responses.Tool[] = [
-    {
-      type: "function",
-      name: "saveUser",
-      strict: true,
-      description:
-        "сохраняет пользователя в базе данных для дальнейшей работы с ним. Обязательно вызывай ее после окончания диалога",
-      parameters: {
-        type: "object",
-        properties: {
-          comment: {
-            type: "string",
-            description:
-              "Комментарий про диалог с пользователем. Постарайся довольно подробно описать его и дать советы по работе с этим клиентом",
-          },
-          class: {
-            type: "string",
-            enum: ["A", "B", "C", "D"],
-            description:
-              "Тип пользователя. A - Заполнил анкету или заявку. B - Оставил номер телефона или потребовал менеджера. C - перешел в чат-бота или ты ему скинул на него ссылку. D - прочие случаи",
-          },
-          required: ["class", "comment"],
-          additionalProperties: false,
-        },
-      },
-    },
-  ];
-
   private openai = new OpenAI({
     apiKey: process.env.OPENAI_TOKEN,
   });
@@ -85,7 +57,6 @@ export class AI {
       store: true,
       previous_response_id: prev,
       instructions: `Тебя зовут: ${name}\n\n` + this.prompt,
-      // tools: this.tools
     });
 
     return {
