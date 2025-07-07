@@ -23,9 +23,15 @@ class AmoCrm {
   constructor() {}
 
   public async addDeal(data: ICreateDeal[]): Promise<{
-    id: number;
+    id: number
   }> {
-    const res = await axios.post(
+    const res: AxiosResponse<{
+    _embedded: {
+      leads: [{
+        id: number
+      }]
+    }
+  }> = await axios.post(
       "https://plgmail.amocrm.ru/api/v4/leads",
       data,
       {
@@ -34,15 +40,15 @@ class AmoCrm {
         },
       },
     );
-    return res.data;
+    return res.data._embedded.leads[0];
   }
 
   public async editDeal(data: {
     id: number;
     /**
-     * China/Not China/Not WB
+     * China/Not China/Not WB/Unknown
      */
-    status_id: 77868902 | 77868906 | 77868910;
+    status_id: 77868902 | 77868906 | 77868910 | 77868898;
     custom_fileds_values: {
       field_id: 758239;
       values: {
@@ -113,6 +119,19 @@ class AmoCrm {
         },
       })
     ).data;
+  }
+
+  public getStatusId(tag: 'china' | 'not-china' | 'not-wb' | 'unclear'): 77868902 | 77868906 | 77868910 | 77868898 {
+    switch (tag) {
+      case 'china':
+        return 77868902;
+      case 'not-china':
+        return 77868906;
+      case 'not-wb':
+        return 77868910;
+      case 'unclear':
+        return 77868898;
+    }
   }
 }
 

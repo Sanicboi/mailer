@@ -1,4 +1,12 @@
 import OpenAI from "openai";
+import { z } from "zod";
+import {zodTextFormat} from 'openai/helpers/zod';
+
+
+const Determination = z.object({
+    type: z.enum(['china', 'not-china', 'not-wb', 'unclear'])
+});
+
 
 export class AI {
   private tools: OpenAI.Responses.Tool[] = [
@@ -84,5 +92,19 @@ export class AI {
       text: res.output_text,
       id: res.id,
     };
+  }
+
+  public async determine(dialog: string): Promise<'china' | 'not-china' | 'not-wb' | 'unclear'> {
+    const res = await this.openai.responses.parse({
+      model: 'gpt-4.1-nano',
+      input: dialog,
+      instructions: 'Ты -менеджер по продажам. Тебе будет дан диалог менеджера и клиента. Определи, к какой категории относится клиент (продает в китае, продает не в китае, не продает на вб, неизвестно).',
+      text: {
+        format: zodTextFormat(Determination, 'result')
+      },
+      store: false,
+    });
+    if (!res.output_parsed) throw new Error("Could not parse");
+    return res.output_parsed.type;
   }
 }

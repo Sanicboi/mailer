@@ -58,61 +58,26 @@ router.get("/", async (req: Req, res) => {
   res.status(200).json(mailings);
 });
 
-// router.post(
-//   "/evaluation",
-//   async (
-//     req: Req<{
-//       amount: number;
-//       baseId: number;
-//     }>,
-//     res
-//   ) => {
-//     if (!req.user) return;
-//     if (!req.user) return;
-//     // Determine the amount of accounts available/necessary
-//     const N = 15;
-//     const barrier = dayjs().subtract(2, "days").toDate();
-//     const max = Math.ceil(req.body.amount / N);
-//     console.log(max);
-//     let bots = await manager.find(Bot, {
-//       where: {
-//         user: req.user,
-//         blocked: false,
-//       },
-//       take: max,
-//       order: {
-//         lastMessage: "ASC",
-//       },
-//     });
-//     // bots = bots.filter(el => !el.lastMessage || dayjs(el.lastMessage).isBefore(barrier));
-//     console.log(bots);
-//     let isEnough: boolean = bots.length === max;
-//     res.status(200).json({
-//       enough: isEnough
-//     })
-//   }
-// );
 
 router.post(
   "/",
   async (
     req: Req<{
-      amount: number;
+      numAccs: number;
       baseId: number;
     }>,
     res,
   ): Promise<any> => {
     if (!req.user) return;
-    // Determine the amount of accounts available/necessary
+
     const N = 15;
-    // const barrier = dayjs().subtract(2, "days").toDate();
-    // const max = Math.ceil(req.body.amount / N);
+    const barrier = dayjs().subtract(2, "days").toDate();
     let bots = await manager.find(Bot, {
       where: {
         user: req.user,
         blocked: false,
       },
-      take: req.body.amount,
+      take: req.body.numAccs,
       order: {
         lastMessage: "ASC",
       },
@@ -149,7 +114,6 @@ router.post(
       bots[i].mailings.push(mailing);
     }
 
-    console.log(bots);
 
     res.status(201).end();
 
@@ -172,7 +136,7 @@ router.post(
           await wait(dayjs().diff(bots[botIdx].lastMessage, "s"));
         }
         bots[botIdx].lastMessage = new Date();
-        console.log(bots[botIdx]);
+
         await manager.save(bots[botIdx]);
 
         await client.sendMessage(leads[i].username, {
@@ -209,9 +173,23 @@ router.post(
           ])
         ).id;
         await manager.save(leads[i]);
-      } catch (error) {}
+      } catch (error) {
+        console.error(error);
+      }
     }
   },
 );
+
+router.put('/:id', async (req: Req, res): Promise<any> => {
+  const mailing = await manager.findOne(Mailing, {
+    where: {
+      user: req.user,
+      active: true
+    }
+  });
+  if (!mailing) return res.status(404).end();
+  mailing.active = false;
+  await manager.save(mailing);
+})
 
 export default router;

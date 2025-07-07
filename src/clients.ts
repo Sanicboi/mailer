@@ -4,6 +4,8 @@ import { NewMessage, NewMessageEvent } from "telegram/events";
 import { manager } from "./db";
 import { Bot } from "./entities/bot";
 import { AI } from "./ai";
+import { wait } from "./utils";
+import { amo } from "./crm";
 
 export const clients = new Map<string, TelegramClient>();
 
@@ -45,13 +47,37 @@ const callback = async (e: NewMessageEvent, client: TelegramClient, ai: AI) => {
       action: new Api.SendMessageTypingAction(),
     }),
   );
-  await new Promise((res, rej) => setTimeout(res, 1000 * 5));
+  await wait(5);
   const res = await ai.respond(
     e.message.text,
     lead.previousResId,
     me.firstName!,
   );
   lead.previousResId = res.id;
+  try {
+    const msgs = await client.getMessages(lead.username, {
+      reverse: true
+    });
+    const asStr = msgs.map<string>(el => `${el.senderId?.toJSON() == me.id.toJSON() ? 'Бот' : 'Пользователь'}: ${el.text}`).join('\n');
+    const category = amo.getStatusId(await ai.determine(asStr));
+    
+    await amo.editDeal({
+      id: lead.amoId,
+      custom_fileds_values: [
+        {
+          field_id: 758239,
+          values: [
+            {
+              value: asStr
+            }
+          ]
+        }
+      ],
+      status_id: category,
+    })
+  } catch (error) {
+    console.error(error);
+  }
   await manager.save(lead);
   await client.sendMessage(lead.username, {
     message: res.text,
