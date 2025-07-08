@@ -121,8 +121,10 @@ router.post('/send', async (req: Req<{
       bot: true
     }
   });
+  console.log(leads);
   const ai = new AI(req.user!.prompt);
   for (const lead of leads) {
+    console.log(lead);
     try {
       const client = clients.get(lead.bot.phone);
       if (!client) continue;
@@ -164,6 +166,8 @@ router.post('/send', async (req: Req<{
       console.error(error);
     }
   }
+
+  res.status(204).end();
 })
 
 export default router;
