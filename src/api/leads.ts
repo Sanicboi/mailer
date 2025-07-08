@@ -149,7 +149,7 @@ router.post('/send', async (req: Req<{
             }]
           },
           {
-            field_id: 758239,
+            field_id: 759347,
             values: [{
               value: asString
             }]
@@ -163,7 +163,7 @@ router.post('/send', async (req: Req<{
         ]
       }])).id;
       await manager.save(lead);
-      await wait(0.2);
+      await wait(0.5);
     } catch (error) {
       console.error(error);
     }

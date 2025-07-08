@@ -65,7 +65,7 @@ const callback = async (e: NewMessageEvent, client: TelegramClient, ai: AI) => {
       id: lead.amoId,
       custom_fileds_values: [
         {
-          field_id: 758239,
+          field_id: 759347,
           values: [
             {
               value: asStr

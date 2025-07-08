@@ -1,7 +1,7 @@
 import axios, { Axios, AxiosResponse } from "axios";
 
 type CustomField = {
-  field_id: 193951 | 758239 | 758241;
+  field_id: 193951 | 759347 | 758241;
   values: {
     value: string;
   }[];
@@ -50,7 +50,7 @@ class AmoCrm {
      */
     status_id: 77868902 | 77868906 | 77868910 | 77868898;
     custom_fileds_values: {
-      field_id: 758239;
+      field_id: 759347;
       values: {
         value: string;
       }[];
