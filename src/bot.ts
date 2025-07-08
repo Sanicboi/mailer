@@ -88,3 +88,11 @@ bot.onText(/./, async (msg) => {
     baseId = null;
   }
 });
+
+
+bot.onText(/\/export /, async (msg) => {
+  const baseId: number = Number(msg.text!.split(' ')[1]); 
+  await axios.post('/api/leads/send', {
+    baseId
+  });
+})

@@ -10,7 +10,7 @@ type CustomField = {
 export interface ICreateDeal {
   name?: string;
   price?: number;
-  status_id: 77868898;
+  status_id: 77868898 | 77868902 | 77868906 | 77868910;
   pipeline_id: 9442090;
   custom_fields_values?: CustomField[];
   tags_to_add?: {

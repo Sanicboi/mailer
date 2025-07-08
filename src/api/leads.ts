@@ -3,6 +3,9 @@ import { Req } from "./middleware/auth";
 import { manager } from "../db";
 import { LeadBase } from "../entities/leadBase";
 import { Lead } from "../entities/lead";
+import { amo } from "../crm";
+import { clients } from "../clients";
+import { AI } from "../ai";
 
 const router = e.Router();
 
@@ -105,5 +108,62 @@ router.post(
     }
   },
 );
+
+router.post('/send', async (req: Req<{
+  baseId: number
+}>, res) => {
+  const lb = new LeadBase();
+  const leads = await manager.find(Lead, {
+    where: {
+      leadBase: lb
+    },
+    relations: {
+      bot: true
+    }
+  });
+  const ai = new AI(req.user!.prompt);
+  for (const lead of leads) {
+    try {
+      const client = clients.get(lead.bot.phone);
+      if (!client) continue;
+      await client.getDialogs();
+      const me = await client.getMe();
+      const msgs = await client.getMessages(lead.username, {
+        reverse: true
+      });
+      const asString = msgs.map<string>(el => `${el.senderId?.toJSON() == me.id.toJSON() ? 'Бот' : 'Пользователь'}: ${el.text}`).join('\n');
+      const status = await ai.determine(asString);
+      const statusId = amo.getStatusId(status);
+      lead.amoId = (await amo.addDeal([{
+        pipeline_id: 9442090,
+        status_id: statusId,
+        name: lead.username,
+        custom_fields_values: [
+          {
+            field_id: 193951,
+            values: [{
+              value: lead.phone
+            }]
+          },
+          {
+            field_id: 758239,
+            values: [{
+              value: asString
+            }]
+          },
+          {
+            field_id: 758241,
+            values: [{
+              value: lead.username
+            }]
+          }
+        ]
+      }])).id;
+      await manager.save(lead);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+})
 
 export default router;
