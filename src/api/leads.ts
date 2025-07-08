@@ -6,6 +6,7 @@ import { Lead } from "../entities/lead";
 import { amo } from "../crm";
 import { clients } from "../clients";
 import { AI } from "../ai";
+import { wait } from "../utils";
 
 const router = e.Router();
 
@@ -162,6 +163,7 @@ router.post('/send', async (req: Req<{
         ]
       }])).id;
       await manager.save(lead);
+      await wait(0.2);
     } catch (error) {
       console.error(error);
     }
