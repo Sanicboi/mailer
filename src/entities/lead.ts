@@ -54,4 +54,9 @@ export class Lead {
     nullable: true,
   })
   bot: Bot;
+
+  @Column({
+    default: ''
+  })
+  inn: string;
 }

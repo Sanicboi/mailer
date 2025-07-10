@@ -159,6 +159,12 @@ router.post('/send', async (req: Req<{
             values: [{
               value: lead.username
             }]
+          },
+          {
+            field_id: 759493,
+            values: [{
+              value: lead.inn
+            }]
           }
         ]
       }])).id;
