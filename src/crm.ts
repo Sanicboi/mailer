@@ -1,7 +1,22 @@
 import axios, { Axios, AxiosResponse } from "axios";
 
+export enum CustomFieldID {
+  Phone = 193951,
+  Username = 758241,
+  Dialog = 759347,
+  INN = 759493
+}
+
+export enum StatusID {
+  China = 77868902,
+  NotChina = 77868906,
+  NotWB = 77868910,
+  Unknown = 77868898
+}
+
+
 type CustomField = {
-  field_id: 193951 | 759347 | 758241 | 759493;
+  field_id: CustomFieldID;
   values: {
     value: string;
   }[];
@@ -10,7 +25,7 @@ type CustomField = {
 export interface ICreateDeal {
   name?: string;
   price?: number;
-  status_id: 77868898 | 77868902 | 77868906 | 77868910;
+  status_id: StatusID;
   pipeline_id: 9442090;
   custom_fields_values?: CustomField[];
   tags_to_add?: {
@@ -45,16 +60,8 @@ class AmoCrm {
 
   public async editDeal(data: {
     id: number;
-    /**
-     * China/Not China/Not WB/Unknown
-     */
-    status_id: 77868902 | 77868906 | 77868910 | 77868898;
-    custom_fileds_values: {
-      field_id: 759347;
-      values: {
-        value: string;
-      }[];
-    }[];
+    status_id: StatusID;
+    custom_fileds_values: CustomField[];
   }) {
     await axios.patch("https://plgmail.amocrm.ru/api/v4/leads", {
       headers: {
@@ -121,16 +128,16 @@ class AmoCrm {
     ).data;
   }
 
-  public getStatusId(tag: 'china' | 'not-china' | 'not-wb' | 'unclear'): 77868902 | 77868906 | 77868910 | 77868898 {
+  public getStatusId(tag: 'china' | 'not-china' | 'not-wb' | 'unclear'): StatusID {
     switch (tag) {
       case 'china':
-        return 77868902;
+        return StatusID.China;
       case 'not-china':
-        return 77868906;
+        return StatusID.NotChina;
       case 'not-wb':
-        return 77868910;
+        return StatusID.NotWB;
       case 'unclear':
-        return 77868898;
+        return StatusID.Unknown;
     }
   }
 }

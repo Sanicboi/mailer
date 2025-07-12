@@ -9,7 +9,7 @@ import { Lead } from "../entities/lead";
 import { LeadBase } from "../entities/leadBase";
 import { clients } from "../clients";
 import { AI } from "../ai";
-import { amo } from "../crm";
+import { amo, CustomFieldID } from "../crm";
 import { wait } from "../utils";
 
 const router = e.Router();
@@ -152,7 +152,7 @@ router.post(
               status_id: 77868898,
               custom_fields_values: [
                 {
-                  field_id: 193951,
+                  field_id: CustomFieldID.Phone,
                   values: [
                     {
                       value: leads[i].phone,
@@ -160,13 +160,19 @@ router.post(
                   ],
                 },
                 {
-                  field_id: 758241,
+                  field_id: CustomFieldID.Username,
                   values: [
                     {
                       value: leads[i].username,
                     },
                   ],
                 },
+                {
+                  field_id: CustomFieldID.INN,
+                  values: [{
+                    value: leads[i].inn
+                  }]
+                }
               ],
               name: leads[i].username,
             },

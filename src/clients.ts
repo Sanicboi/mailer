@@ -5,7 +5,7 @@ import { manager } from "./db";
 import { Bot } from "./entities/bot";
 import { AI } from "./ai";
 import { wait } from "./utils";
-import { amo } from "./crm";
+import { amo, CustomFieldID } from "./crm";
 
 export const clients = new Map<string, TelegramClient>();
 
@@ -65,7 +65,7 @@ const callback = async (e: NewMessageEvent, client: TelegramClient, ai: AI) => {
       id: lead.amoId,
       custom_fileds_values: [
         {
-          field_id: 759347,
+          field_id: CustomFieldID.Dialog,
           values: [
             {
               value: asStr

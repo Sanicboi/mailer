@@ -7,6 +7,10 @@ const Determination = z.object({
     type: z.enum(['china', 'not-china', 'not-wb', 'unclear'])
 });
 
+const INN = z.object({
+  inn: z.string()
+});
+
 
 export class AI {
   private openai = new OpenAI({
@@ -77,5 +81,24 @@ export class AI {
     });
     if (!res.output_parsed) throw new Error("Could not parse");
     return res.output_parsed.type;
+  }
+
+  public async getINN(name: string): Promise<string> {
+    const res = await this.openai.responses.parse({
+      store: false,
+      input: name,
+      instructions: 'Тебе будет дано полное имя ИП. Найди его ИНН или верни пустую строку, если не смог',
+      model: 'gpt-4.1-mini',
+      tools: [
+        {
+          type: 'web_search_preview',
+        }
+      ],
+      text: {
+        format: zodTextFormat(INN, 'result')
+      }
+    });
+    if (!res.output_parsed) throw new Error("could not parse");
+    return res.output_parsed.inn;
   }
 }
