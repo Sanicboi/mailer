@@ -172,6 +172,12 @@ router.post(
                   values: [{
                     value: leads[i].inn
                   }]
+                },
+                {
+                  field_id: CustomFieldID.Dialog,
+                  values: [{
+                    value: firstRes.text
+                  }]
                 }
               ],
               name: leads[i].username,
