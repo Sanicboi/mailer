@@ -56,11 +56,16 @@ const callback = async (e: NewMessageEvent, client: TelegramClient, ai: AI) => {
   lead.previousResId = res.id;
   try {
     const msgs = await client.getMessages(lead.username, {
-      reverse: true
+      reverse: true,
     });
-    const asStr = msgs.map<string>(el => `${el.senderId?.toJSON() == me.id.toJSON() ? 'Бот' : 'Пользователь'}: ${el.text}`).join('\n');
+    const asStr = msgs
+      .map<string>(
+        (el) =>
+          `${el.senderId?.toJSON() == me.id.toJSON() ? "Бот" : "Пользователь"}: ${el.text}`,
+      )
+      .join("\n");
     const category = amo.getStatusId(await ai.determine(asStr));
-    
+
     await amo.editDeal({
       id: lead.amoId,
       custom_fileds_values: [
@@ -68,13 +73,13 @@ const callback = async (e: NewMessageEvent, client: TelegramClient, ai: AI) => {
           field_id: CustomFieldID.Dialog,
           values: [
             {
-              value: asStr
-            }
-          ]
-        }
+              value: asStr,
+            },
+          ],
+        },
       ],
       status_id: category,
-    })
+    });
   } catch (error) {
     console.error(error);
   }

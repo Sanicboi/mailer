@@ -4,6 +4,7 @@
   "description": "Awesome project developed with TypeORM.",
   "type": "commonjs",
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.15.29",
@@ -14,6 +15,7 @@
   "dependencies": {
     "@types/node-telegram-bot-api": "^0.64.8",
     "axios": "^1.9.0",
+    "bcrypt": "^6.0.0",
     "dayjs": "^1.11.13",
     "dotenv": "^16.5.0",
     "exceljs": "^4.4.0",
@@ -28,6 +30,7 @@
     "telegram": "^2.26.22",
     "tough-cookie": "^5.1.2",
     "typeorm": "0.3.24",
+    "vitest": "^3.2.4",
     "zod": "^3.25.46"
   },
   "scripts": {

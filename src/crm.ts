@@ -4,16 +4,15 @@ export enum CustomFieldID {
   Phone = 193951,
   Username = 758241,
   Dialog = 759347,
-  INN = 759493
+  INN = 759493,
 }
 
 export enum StatusID {
   China = 77868902,
   NotChina = 77868906,
   NotWB = 77868910,
-  Unknown = 77868898
+  Unknown = 77868898,
 }
-
 
 type CustomField = {
   field_id: CustomFieldID;
@@ -38,32 +37,30 @@ class AmoCrm {
   constructor() {}
 
   public async addDeal(data: ICreateDeal[]): Promise<{
-    id: number
+    id: number;
   }> {
     const res: AxiosResponse<{
-    _embedded: {
-      leads: [{
-        id: number
-      }]
-    }
-  }> = await axios.post(
-      "https://plgmail.amocrm.ru/api/v4/leads",
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.AMO_TOKEN}`,
-        },
+      _embedded: {
+        leads: [
+          {
+            id: number;
+          },
+        ];
+      };
+    }> = await axios.post("https://plgmail.amocrm.ru/api/v4/leads", data, {
+      headers: {
+        Authorization: `Bearer ${process.env.AMO_TOKEN}`,
       },
-    );
+    });
     return res.data._embedded.leads[0];
   }
 
   public async editDeal(data: {
     id: number;
     status_id: StatusID;
-    custom_fileds_values: CustomField[];
+    custom_fields_values: CustomField[];
   }) {
-    await axios.patch("https://plgmail.amocrm.ru/api/v4/leads", {
+    await axios.patch(`https://plgmail.amocrm.ru/api/v4/leads/${data.id}`, data, {
       headers: {
         Authorization: `Bearer ${process.env.AMO_TOKEN}`,
       },
@@ -111,6 +108,58 @@ class AmoCrm {
     ).data;
   }
 
+  public async getLeads(): Promise<
+    {
+      id: number;
+      name: string;
+      status_id: StatusID;
+      pipeline_id: 9442090;
+      custom_fields_values: CustomField[] | null;
+    }[]
+  > {
+    let result: {
+      id: number;
+      name: string;
+      status_id: StatusID;
+      pipeline_id: 9442090;
+      custom_fields_values: CustomField[] | null;
+    }[] = [];
+    let r: {
+      _links: {
+        next?: {
+          href: string;
+        };
+      };
+      _embedded: {
+        leads: {
+          id: number;
+          name: string;
+          status_id: StatusID;
+          pipeline_id: 9442090;
+          custom_fields_values: CustomField[] | null;
+        }[];
+      };
+    } = (
+      await axios.get("https://plgmail.amocrm.ru/api/v4/leads?limit=250", {
+        headers: {
+          Authorization: `Bearer ${process.env.AMO_TOKEN}`,
+        },
+      })
+    ).data;
+    result = result.concat(r._embedded.leads);
+    while (r._links.next && r._links.next.href) {
+      r = (
+        await axios.get(r._links.next.href, {
+          headers: {
+            Authorization: `Bearer ${process.env.AMO_TOKEN}`,
+          },
+        })
+      ).data;
+      result = result.concat(r._embedded.leads);
+    }
+    return result;
+  }
+
   public async getTags(): Promise<{
     _embedded: {
       tags: {
@@ -128,15 +177,17 @@ class AmoCrm {
     ).data;
   }
 
-  public getStatusId(tag: 'china' | 'not-china' | 'not-wb' | 'unclear'): StatusID {
+  public getStatusId(
+    tag: "china" | "not-china" | "not-wb" | "unknown",
+  ): StatusID {
     switch (tag) {
-      case 'china':
+      case "china":
         return StatusID.China;
-      case 'not-china':
+      case "not-china":
         return StatusID.NotChina;
-      case 'not-wb':
+      case "not-wb":
         return StatusID.NotWB;
-      case 'unclear':
+      case "unknown":
         return StatusID.Unknown;
     }
   }

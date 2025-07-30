@@ -1,0 +1,67 @@
+import OpenAI from "openai";
+import fs from 'fs';
+import path from "path";
+import { z } from "zod";
+import {zodTextFormat} from 'openai/helpers/zod';
+
+class Response {
+  constructor(public readonly id: string, public readonly text: string) {}
+}
+
+const StatusFormat = z.object({
+  leadStatus: z.enum(['china', 'not-china', 'not-wb', 'unknown']),
+  dialogueFinished: z.boolean()
+})
+
+class AI {
+  private _openai: OpenAI;
+  public readonly prompt = fs.readFileSync(path.join(process.cwd(), 'prompt.txt'), 'utf-8');
+
+  constructor() {
+    if (!process.env.OPENAI_TOKEN) throw new Error("Env not set");
+    this._openai = new OpenAI({
+      apiKey: process.env.OPENAI_TOKEN,
+    });
+  }
+
+  public async start(data: string, prompt: string): Promise<Response> {
+    const res = await this._openai.responses.create({
+      input: `Начни диалог. Данные о клиенте: ${data}`,
+      model: 'gpt-4.1-mini',
+      store: true,
+      instructions: prompt,
+    });
+    return new Response(res.id, res.output_text);
+  }
+
+  public async respond(text: string, prompt: string, prevId?: string): Promise<Response> {
+    const res = await this._openai.responses.create({
+      input: text,
+      model: 'gpt-4.1-mini',
+      store: true,
+      instructions: prompt,
+      previous_response_id: prevId
+    });
+    return new Response(res.id, res.output_text);
+  }
+  
+  public async getStatus(dialogue: string): Promise<{
+    leadStatus: 'china' | 'not-china' | 'not-wb' | 'unknown',
+    dialogueFinished: boolean
+  }> {
+    const res = await this._openai.responses.parse({
+      model: 'gpt-4.1',
+      input: dialogue,
+      instructions: 'Ты - менеджер по продажам. тебе будет дан диалог с клиентом. Тебе надо будет определить статус лида и статус диалога. Лидо может либо продавать на Вайлдберриз (ВБ) через Китай, либо продавать на ВБ не через Китай, а через другую страну, либо не продавать на ВБ вообще. Для остальных случаев используй статус "неизвестно". Также определи, закончен ли диалог с пользователем (т.е. закончил ли его менеджер или нет)',
+      store: false,
+      text: {
+        format: zodTextFormat(StatusFormat, 'result')
+      }
+    });
+    if (!res.output_parsed) throw new Error("Could not parse");
+    return res.output_parsed;
+  }
+}
+
+
+export const ai = new AI();

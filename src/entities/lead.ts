@@ -1,7 +1,4 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
-import { LeadBase } from "./leadBase";
-import { User } from "./user";
-import { Mailing } from "./mailing";
 import { Bot } from "./bot";
 
 @Entity()
@@ -10,14 +7,24 @@ export class Lead {
   username: string;
 
   @Column({
-    nullable: true,
+    default: "",
   })
-  phone: string;
+  dialogData: string;
 
   @Column({
     default: "",
   })
-  data: string;
+  amoId: string;
+
+  @Column({
+    nullable: true
+  })
+  inn: string;
+
+  @Column({
+    nullable: true
+  })
+  phone: string;
 
   @Column({
     default: false,
@@ -27,36 +34,21 @@ export class Lead {
   @Column({
     nullable: true,
   })
-  amoId: number;
-
-  @Column({
-    nullable: true,
-  })
-  previousResId: string;
+  resId: string;
 
   @Column({
     default: false,
   })
   replied: boolean;
 
-  @ManyToOne(() => LeadBase, (leadBase) => leadBase.leads)
-  leadBase: LeadBase;
-
-  @ManyToOne(() => User, (user) => user.leads)
-  user: User;
-
-  @ManyToOne(() => Mailing, (mailing) => mailing.leads, {
-    nullable: true,
+  @Column({
+    default: false,
   })
-  mailing: Mailing;
+  finished: boolean;
+
 
   @ManyToOne(() => Bot, (bot) => bot.leads, {
     nullable: true,
   })
   bot: Bot;
-
-  @Column({
-    default: ''
-  })
-  inn: string;
 }

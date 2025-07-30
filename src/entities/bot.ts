@@ -6,8 +6,6 @@ import {
   OneToMany,
   PrimaryColumn,
 } from "typeorm";
-import { User } from "./user";
-import { Mailing } from "./mailing";
 import { Lead } from "./lead";
 
 @Entity()
@@ -29,22 +27,6 @@ export class Bot {
     nullable: true,
   })
   lastMessage: Date;
-
-  @Column({
-    default: false,
-  })
-  loggedIn: boolean;
-
-  @Column({
-    default: "",
-  })
-  codeHash: string;
-
-  @ManyToOne(() => User, (user) => user.bots)
-  user: User;
-
-  @ManyToMany(() => Mailing, (mailing) => mailing.bots)
-  mailings: Mailing[];
 
   @OneToMany(() => Lead, (lead) => lead.bot)
   leads: Lead[];
