@@ -127,6 +127,11 @@ class Mailer {
     this._clients.set(phone, client);
     this._loggingIn.delete(phone);
   }
+
+  public getByIdx(i: number): TGClient {
+    const clients = Array.from(this._clients.values()).filter(el => !el.bot.blocked);
+    return clients[i % clients.length];
+  }
 }
 
 export const mailer = new Mailer();

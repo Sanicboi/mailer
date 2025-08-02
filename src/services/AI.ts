@@ -13,6 +13,11 @@ const StatusFormat = z.object({
   dialogueFinished: z.boolean()
 })
 
+const INNFormat = z.object({
+  inn: z.string()
+});
+
+
 class AI {
   private _openai: OpenAI;
   public readonly prompt = fs.readFileSync(path.join(process.cwd(), 'prompt.txt'), 'utf-8');
@@ -60,6 +65,23 @@ class AI {
     });
     if (!res.output_parsed) throw new Error("Could not parse");
     return res.output_parsed;
+  }
+
+
+  public async getINN(name: string): Promise<string> {
+    const res = await this._openai.responses.parse({
+      model: 'gpt-4o-search-preview',
+      tools: [
+        {type: 'web_search_preview'}
+      ],
+      input: `Найди инн данного предпринимателя: ИП ${name}`,
+      store: false,
+      text: {
+        format: zodTextFormat(INNFormat, 'result')
+      }
+    });
+    if (!res.output_parsed) throw new Error("Инн не найден");
+    return res.output_parsed.inn;
   }
 }
 

@@ -5,6 +5,7 @@ import { NewMessageEvent } from "telegram/events";
 import dayjs from "dayjs";
 import { wait } from "../utils";
 import { manager } from "../db";
+import { generateRandomBigInt } from "telegram/Helpers";
 
 export class TGClient {
   private _client: TelegramClient;
@@ -102,6 +103,23 @@ export class TGClient {
     await this._client.sendMessage(to, {
       message
     });
+  }
+
+  public async getUsername(phone: string, fName: string, lName: string): Promise<string> {
+    const res = await this._client.invoke(new Api.contacts.ImportContacts({
+      contacts: [
+        new Api.InputPhoneContact({
+          clientId: generateRandomBigInt(),
+          firstName: fName,
+          lastName: lName,
+          phone: phone
+        })
+      ]
+    }));
+    if (res.users.length === 0) throw new Error("Could not import");
+    const asUser = res.users[0] as Api.User;
+    if (!asUser.username) throw new Error("No username");
+    return asUser.username;
   }
 
   public get bot(): Bot {
