@@ -15,8 +15,3 @@ services:
       - 88:80
     volumes:
       - ~/mailer-data:/var/lib/postgresql/data:rw
-  bot:
-    restart: always
-    build: .
-    command: "npm run bot"
-    env_file: .env
