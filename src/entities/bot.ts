@@ -24,6 +24,11 @@ export class Bot {
   blocked: boolean;
 
   @Column({
+    default: false
+  })
+  active: boolean;
+
+  @Column({
     nullable: true,
   })
   lastMessage: Date;

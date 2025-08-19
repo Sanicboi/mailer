@@ -29,22 +29,22 @@ class AI {
     });
   }
 
-  public async start(data: string, prompt: string): Promise<Response> {
+  public async start(data: string): Promise<Response> {
     const res = await this._openai.responses.create({
       input: `Начни диалог. Данные о клиенте: ${data}`,
       model: 'gpt-4.1-mini',
       store: true,
-      instructions: prompt,
+      instructions: this.prompt,
     });
     return new Response(res.id, res.output_text);
   }
 
-  public async respond(text: string, prompt: string, prevId?: string): Promise<Response> {
+  public async respond(text: string, prevId?: string): Promise<Response> {
     const res = await this._openai.responses.create({
       input: text,
       model: 'gpt-4.1-mini',
       store: true,
-      instructions: prompt,
+      instructions: this.prompt,
       previous_response_id: prevId
     });
     return new Response(res.id, res.output_text);

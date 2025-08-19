@@ -50,5 +50,5 @@ export class Lead {
   @ManyToOne(() => Bot, (bot) => bot.leads, {
     nullable: true,
   })
-  bot: Bot;
+  bot: Bot | null;
 }
