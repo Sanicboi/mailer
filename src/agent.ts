@@ -31,7 +31,7 @@ export class Agent {
             .select()
             .where('lead.sent = false')
             .andWhere('lead.resId IS NULL')
-            .andWhere('lead.bothPhone IS NULL')
+            .andWhere('lead.botPhone IS NULL')
             .take(amount)
             .getMany();
         await db
