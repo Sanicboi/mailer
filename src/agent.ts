@@ -38,7 +38,7 @@ export class Agent {
         await db
             .createQueryBuilder(Lead, 'lead')
             .update()
-            .where('lead.username IN :ids', {
+            .where('lead.username IN (:...ids)', {
                 ids: this._leadsList.map(el => el.username)
             })
             .set({
