@@ -53,6 +53,7 @@ class Mailer {
         let i = 0;
         while (this._agents[i].toMail > 0) {
             await this._agents[i].update();
+            console.log('iter');
             if (!this._agents[i].isActive) break;
             await this._agents[i].mail();
         }

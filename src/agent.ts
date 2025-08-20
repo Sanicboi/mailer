@@ -34,6 +34,7 @@ export class Agent {
             .andWhere('lead.botPhone IS NULL')
             .take(amount)
             .getMany();
+        console.log(this._leadsList);
         await db
             .createQueryBuilder(Lead, 'lead')
             .update()
@@ -124,6 +125,7 @@ export class Agent {
     }
 
     public async mail(): Promise<void> {
+        console.log('mail');
         const lead = this._leadsList.pop();
         if (!lead) return;
         lead.bot = this._bot;
