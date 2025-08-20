@@ -7,7 +7,7 @@ import { Lead } from "./entities/lead";
 class Mailer {
 
 
-    private _agents: Agent[];
+    private _agents: Agent[] = [];
     private _currentPhone: string = '';
 
     constructor() {
