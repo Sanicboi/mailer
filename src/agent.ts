@@ -124,6 +124,10 @@ export class Agent {
         return this._leadsList.length;
     }
 
+    public get lastMsg(): Date {
+        return this._bot.lastMessage;
+    }
+
     public async mail(): Promise<void> {
         console.log('mail');
         const lead = this._leadsList.pop();
@@ -135,6 +139,8 @@ export class Agent {
         await this._client.sendMessage(lead.username, {
             message: msg.text
         });
+        this._bot.lastMessage = new Date();
+        await db.manager.save(this._bot);
         lead.sent = true;
         lead.amoId = String((await amo.addDeal([{
             pipeline_id: 9442090,

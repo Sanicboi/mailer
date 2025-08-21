@@ -1,7 +1,9 @@
+import dayjs from "dayjs";
 import { Agent } from "./agent";
 import { db } from "./db";
 import { Bot } from "./entities/bot";
 import { Lead } from "./entities/lead";
+import { BlockedError } from "./errors";
 
 
 class Mailer {
@@ -79,6 +81,26 @@ class Mailer {
         for (const ag of this._agents) {
             await ag.stop();
         }
+    }
+
+    public async getAgents(): Promise<string[]> {
+        let result: string[] = [];
+        for (const ag of this._agents) {
+            try {
+                await ag.update();
+                result.push(ag.phone);
+            } catch (error) {
+                if (error instanceof BlockedError) {
+                    this._agents = this._agents.filter(el => el.phone != ag.phone);
+                }
+            }
+            
+        }
+        return result;
+    }
+
+    public getAvailable(): number {
+        return this._agents.reduce<number>((val, agent) => dayjs().diff(agent.lastMessage, 'days') >= 2 ? val + 1 : val, 0);
     }
 }
 

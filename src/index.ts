@@ -41,6 +41,10 @@ db.initialize().then(async () => {
     {
       command: 'add',
       description: 'Добавить бота'
+    },
+    {
+      command: 'get',
+      description: 'Статус аккаунтов'
     }
   ])
 
@@ -53,9 +57,21 @@ db.initialize().then(async () => {
     if (msg.text?.startsWith('/')) return;
 
     if (waiter === Waiter.Amount) {
+      const amount = +msg.text!;
+      const available = mailer.getAvailable();
+      if (available < amount) {
+        await bot.sendMessage(msg.chat.id, `Недостаточно свободных агентов. Измените количество или отмените рассылку. Доступно агентов: ${available}`, {
+          reply_markup: {
+            inline_keyboard: [
+              Btn('Отменить рассылку', 'cancel')
+            ]
+          }
+        });
+        return;
+      }
       waiter = Waiter.None;
       await bot.sendMessage(msg.chat.id, 'Рассылка запущена.');
-      await mailer.mail(Number(msg.text), 15);
+      await mailer.mail(amount, 15);
     } else if (waiter === Waiter.Phone) {
       await mailer.addAgent(msg.text!);
       waiter = Waiter.Code;
@@ -77,6 +93,11 @@ db.initialize().then(async () => {
     waiter = Waiter.Phone;
   });
   
+
+  bot.onText(/\/get/, async (msg) => {
+    const agents = await mailer.getAgents();
+    await bot.sendMessage(msg.chat.id, `Незаблокированных агентов: ${agents.length}\n${agents.join('\n')}`);
+  });
 
 
 });
