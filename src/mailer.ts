@@ -53,6 +53,7 @@ class Mailer {
         this._agents.sort((a, b) => a.lastMessage.getTime() - b.lastMessage.getTime());
         const take = Math.min(numAgents, this._agents.length);
         for (let i = 0; i < take; i++) {
+            await this._agents[i].startMailing();
             await this._agents[i].markLeads(numPerAgent);
         }
 
