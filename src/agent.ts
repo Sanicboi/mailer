@@ -111,7 +111,7 @@ export class Agent {
       .createQueryBuilder(Lead, "lead")
       .select()
       .where("lead.sent = false")
-      .andWhere("lead.resId IS NULL")
+      .andWhere("lead.\"resId\" IS NULL")
       .andWhere("lead.botPhone IS NULL")
       .take(amount)
       .getMany();
