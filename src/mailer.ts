@@ -20,7 +20,10 @@ class Mailer {
     public async init(): Promise<void> {
         const ags = await db
             .createQueryBuilder(Bot, 'agent')
-            .where('agent.blocked = false')
+            .where('agent.state <> :blocked AND agent.state <> :loggingIn', {
+                blocked: BotState.BANNED,
+                loggingIn: BotState.LOGGING_IN
+            })
             .select()
             .getMany();
         for (const ag of ags) {
