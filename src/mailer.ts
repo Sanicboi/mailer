@@ -72,7 +72,7 @@ class Mailer {
             .createQueryBuilder(Lead, 'lead')
             .update()
             .where('lead.sent = false')
-            .andWhere('lead.resId IS NULL')
+            .andWhere('lead.\"resId\" IS NULL')
             .andWhere('lead.botPhone IS NOT NULL')
             .set({
                 bot: null
