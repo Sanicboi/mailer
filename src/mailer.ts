@@ -1,9 +1,10 @@
 import dayjs from "dayjs";
 import { Agent } from "./agent";
 import { db } from "./db";
-import { Bot } from "./entities/bot";
+import { Bot, BotState } from "./entities/bot";
 import { Lead } from "./entities/lead";
 import { BlockedError } from "./errors";
+import { wait } from "./utils";
 
 
 class Mailer {
@@ -41,7 +42,7 @@ class Mailer {
         const agent = this._agents.find(el => el.phone === this._currentPhone);
         if (!agent) return;
         await agent.login(code);
-        await agent.save();
+        await agent.create();
         this._currentPhone = '';
     }
 
@@ -54,10 +55,10 @@ class Mailer {
 
         let i = 0;
         while (this._agents[i].toMail > 0) {
-            await this._agents[i].update();
-            console.log('iter');
-            if (!this._agents[i].isActive) break;
+            if (this._agents[i].state !== BotState.MAILING) break;
             await this._agents[i].mail();
+            i = (i + 1) % this._agents.length;
+            if (i === 0) await wait(5 * 60);
         }
 
         for (let i = 0; i < take; i++) {
@@ -79,29 +80,32 @@ class Mailer {
 
     public async stop() {
         for (const ag of this._agents) {
-            await ag.stop();
+            await ag.finish();
         }
     }
 
-    public async getAgents(): Promise<string[]> {
-        let result: string[] = [];
-        for (const ag of this._agents) {
-            try {
-                await ag.update();
-                result.push(ag.phone);
-            } catch (error) {
-                if (error instanceof BlockedError) {
-                    this._agents = this._agents.filter(el => el.phone != ag.phone);
-                }
-            }
-            
-        }
-        return result;
+    public getAgents(): {
+        phone: string,
+        state: BotState
+    }[] {
+        return this._agents.map(el => ({
+            phone: el.phone,
+            state: el.state
+        }));
     }
 
-    public getAvailable(): number {
-        return this._agents.reduce<number>((val, agent) => dayjs().diff(agent.lastMessage, 'days') >= 2 ? val + 1 : val, 0);
+    public async confirm(phone: string): Promise<void> {
+        const ag = this._agents.find(el => el.phone === phone);
+        if (!ag) return;
+        await ag.confirmBlock();
     }
+
+    public async deny(phone: string): Promise<void> {
+        const ag = this._agents.find(el => el.phone === phone);
+        if (!ag) return;
+        await ag.unblock();
+    }
+
 }
 
 

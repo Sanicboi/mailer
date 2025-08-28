@@ -39,13 +39,13 @@ class AI {
     return new Response(res.id, res.output_text);
   }
 
-  public async respond(text: string, prevId?: string): Promise<Response> {
+  public async respond(text: string, prevId: string | null): Promise<Response> {
     const res = await this._openai.responses.create({
       input: text,
       model: 'gpt-4.1-mini',
       store: true,
       instructions: this.prompt,
-      previous_response_id: prevId
+      previous_response_id: prevId ?? undefined
     });
     return new Response(res.id, res.output_text);
   }

@@ -31,10 +31,10 @@ export class Lead {
   })
   sent: boolean;
 
-  @Column({
+  @Column('text', {
     nullable: true,
   })
-  resId: string;
+  resId: string | null;
 
   @Column({
     default: false,

@@ -8,6 +8,15 @@ import {
 } from "typeorm";
 import { Lead } from "./lead";
 
+export enum BotState {
+  IDLE = 1,
+  MAILING = 2,
+  POSSIBLE_SPAMBLOCK = 3,
+  CONFIRMED_SPAMBLOCK = 4,
+  BANNED = 5,
+  LOGGING_IN = 6
+}
+
 @Entity()
 export class Bot {
   @PrimaryColumn()
@@ -18,15 +27,11 @@ export class Bot {
   })
   token: string;
 
-  @Column({
-    default: false,
+  @Column('enum', {
+    enum: BotState,
+    default: BotState.IDLE
   })
-  blocked: boolean;
-
-  @Column({
-    default: false
-  })
-  active: boolean;
+  state: BotState;
 
   @Column({
     nullable: true,
