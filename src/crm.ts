@@ -60,11 +60,15 @@ class AmoCrm {
     status_id: StatusID;
     custom_fields_values: CustomField[];
   }) {
-    await axios.patch(`https://plgmail.amocrm.ru/api/v4/leads/${data.id}`, data, {
-      headers: {
-        Authorization: `Bearer ${process.env.AMO_TOKEN}`,
+    await axios.patch(
+      `https://plgmail.amocrm.ru/api/v4/leads/${data.id}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.AMO_TOKEN}`,
+        },
       },
-    });
+    );
   }
 
   public async getCustomFields(): Promise<{

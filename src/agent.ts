@@ -42,7 +42,7 @@ export class Agent {
       new StringSession(token ?? ""),
       +process.env.TG_API_ID!,
       process.env.TG_API_HASH!,
-      {}
+      {},
     );
   }
 
@@ -69,7 +69,7 @@ export class Agent {
         apiHash: process.env.TG_API_HASH!,
         apiId: +process.env.TG_API_ID!,
       },
-      this._phone
+      this._phone,
     );
     this._hash = res.phoneCodeHash;
   }
@@ -80,7 +80,7 @@ export class Agent {
         phoneCode: code,
         phoneCodeHash: this._hash,
         phoneNumber: this._phone,
-      })
+      }),
     );
     this._hash = "";
   }
@@ -111,7 +111,7 @@ export class Agent {
       .createQueryBuilder(Lead, "lead")
       .select()
       .where("lead.sent = false")
-      .andWhere("lead.\"resId\" IS NULL")
+      .andWhere('lead."resId" IS NULL')
       .andWhere("lead.botPhone IS NULL")
       .take(amount)
       .getMany();
@@ -134,7 +134,7 @@ export class Agent {
         await db
           .createQueryBuilder(Lead, "lead")
           .update()
-          .where("lead.username IN (...:ids)", {
+          .where("lead.username IN (:...ids)", {
             ids: this._leadsList.map((el) => el.username),
           })
           .set({
@@ -146,6 +146,7 @@ export class Agent {
           })
           .execute();
         this._leadsList = [];
+        this._bot.state = BotState.IDLE;
         break;
       case BotState.LOGGING_IN:
         this._hash = "";
@@ -294,7 +295,7 @@ export class Agent {
               ],
             },
           ])
-        ).id
+        ).id,
       );
       await db.manager.save(lead);
     }
@@ -313,16 +314,22 @@ export class Agent {
   }
 
   public async unblock(): Promise<void> {
-    if (this.state === BotState.POSSIBLE_SPAMBLOCK || this.state === BotState.CONFIRMED_SPAMBLOCK) {
-        this._bot.state = BotState.IDLE;
-        await db.manager.save(this._bot);
+    if (
+      this.state === BotState.POSSIBLE_SPAMBLOCK ||
+      this.state === BotState.CONFIRMED_SPAMBLOCK
+    ) {
+      this._bot.state = BotState.IDLE;
+      await db.manager.save(this._bot);
     }
   }
 
   public async confirmBlock(): Promise<void> {
-    if (this.state === BotState.POSSIBLE_SPAMBLOCK || this.state === BotState.IDLE) {
-        this._bot.state = BotState.CONFIRMED_SPAMBLOCK;
-        await db.manager.save(this._bot);
+    if (
+      this.state === BotState.POSSIBLE_SPAMBLOCK ||
+      this.state === BotState.IDLE
+    ) {
+      this._bot.state = BotState.CONFIRMED_SPAMBLOCK;
+      await db.manager.save(this._bot);
     }
   }
 }

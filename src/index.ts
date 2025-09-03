@@ -3,7 +3,11 @@ import "dotenv/config";
 import { mailer } from "./mailer";
 import TelegramBot from "node-telegram-bot-api";
 import { BotState } from "./entities/bot";
-import { wait } from "./utils";
+import path from "path";
+import axios, { AxiosResponse } from "axios";
+import { Lead } from "./entities/lead";
+import fs from "fs/promises";
+import { ai } from "./services/AI";
 
 const Btn = (text: string, data: string) => [
   {
@@ -19,7 +23,16 @@ enum Waiter {
   Code = 3,
   Amount = 4,
   ConfirmPhone = 5,
-  DenyPhone = 6
+  DenyPhone = 6,
+  KB = 7,
+  Prompt = 8,
+}
+
+interface IUser {
+  username: string;
+  data: string;
+  inn: string;
+  phone: string;
 }
 
 let waiter: Waiter = Waiter.None;
@@ -28,6 +41,7 @@ let phones: string[] = [];
 
 db.initialize().then(async () => {
   await mailer.init();
+  await ai.init();
 
   const bot = new TelegramBot(process.env.ILSUR_TOKEN!, {
     polling: true,
@@ -49,6 +63,18 @@ db.initialize().then(async () => {
     {
       command: "get",
       description: "Статус аккаунтов",
+    },
+    {
+      command: "kb",
+      description: "Изменить базу знаний",
+    },
+    {
+      command: "prompt",
+      description: "Изменить промпт",
+    },
+    {
+      command: "users",
+      description: "Добавить лидов",
     },
   ]);
 
@@ -73,7 +99,7 @@ db.initialize().then(async () => {
             reply_markup: {
               inline_keyboard: [Btn("Отменить рассылку", "cancel")],
             },
-          }
+          },
         );
         return;
       }
@@ -91,11 +117,11 @@ db.initialize().then(async () => {
     } else if (waiter === Waiter.ConfirmPhone) {
       waiter = Waiter.None;
       await mailer.confirm(msg.text!);
-      await bot.sendMessage(msg.chat.id, 'Успешно заблокирован.');
+      await bot.sendMessage(msg.chat.id, "Успешно заблокирован.");
     } else if (waiter === Waiter.DenyPhone) {
       waiter = Waiter.DenyPhone;
       await mailer.deny(msg.text!);
-      await bot.sendMessage(msg.chat.id, 'Успешно разблокирован.');
+      await bot.sendMessage(msg.chat.id, "Успешно разблокирован.");
     }
   });
 
@@ -108,7 +134,6 @@ db.initialize().then(async () => {
     await bot.sendMessage(msg.chat.id, "Пришлите номер телефона аккаунта");
     waiter = Waiter.Phone;
   });
-
 
   bot.onText(/\/get/, async (msg) => {
     const agents = mailer.getAgents();
@@ -170,5 +195,68 @@ ${loggingIn.join("\n")}
         ],
       },
     });
+  });
+
+  bot.onText(/\/users/, async (msg) => {
+    waiter = Waiter.Leads;
+    await bot.sendMessage(
+      msg.from!.id,
+      "Пришлите файл с пользователями (JSON из другого бота)",
+    );
+  });
+
+  bot.onText(/\/kb/, async (msg) => {
+    waiter = Waiter.KB;
+    await bot.sendMessage(
+      msg.chat.id,
+      "Теперь пришлите мне файл базы знаний (ПДФ)",
+    );
+  });
+
+  bot.onText(/\/prompt/, async (msg) => {
+    waiter = Waiter.Prompt;
+    await bot.sendMessage(
+      msg.chat.id,
+      "Теперь пришлите мне новый промпт (файлом .txt UTF-8)",
+    );
+  });
+
+  bot.on("document", async (msg) => {
+    if (!msg.document) return;
+    const url = await bot.getFileLink(msg.document.file_id);
+    if (waiter === Waiter.Leads) {
+      if (path.extname(url) !== ".json") return;
+      const buf: AxiosResponse<Buffer> = await axios.get(url, {
+        responseType: "arraybuffer",
+      });
+      const asStr = buf.data.toString("utf-8");
+      const parsed: IUser[] = JSON.parse(asStr);
+      for (const u of parsed) {
+        const lead = new Lead();
+        lead.inn = u.inn;
+        lead.username = u.username;
+        lead.phone = u.phone;
+        lead.dialogData = u.data;
+        await db.manager.save(lead);
+      }
+      await bot.sendMessage(msg.chat.id, "Лиды добавлены");
+      waiter = Waiter.None;
+    } else if (waiter === Waiter.KB) {
+      if (path.extname(url) !== ".pdf") return;
+      const buf: AxiosResponse<Buffer> = await axios.get(url, {
+        responseType: "arraybuffer",
+      });
+      await ai.setKB(buf.data);
+      waiter = Waiter.None;
+      await bot.sendMessage(msg.chat.id, "БЗ изменена");
+    } else if (waiter === Waiter.Prompt) {
+      if (path.extname(url) !== ".txt") return;
+      const buf: AxiosResponse<Buffer> = await axios.get(url, {
+        responseType: "arraybuffer",
+      });
+      await ai.setPrompt(buf.data.toString("utf-8"));
+      waiter = Waiter.None;
+      await bot.sendMessage(msg.chat.id, "Промпт изменен");
+    }
   });
 });

@@ -7,3 +7,6 @@ temp/
 .env
 *.temp.*
 *.xlsx
+config.json
+prompt.txt
+main.pdf

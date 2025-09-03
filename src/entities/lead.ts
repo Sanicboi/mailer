@@ -17,12 +17,12 @@ export class Lead {
   amoId: string;
 
   @Column({
-    nullable: true
+    nullable: true,
   })
   inn: string;
 
   @Column({
-    nullable: true
+    nullable: true,
   })
   phone: string;
 
@@ -31,7 +31,7 @@ export class Lead {
   })
   sent: boolean;
 
-  @Column('text', {
+  @Column("text", {
     nullable: true,
   })
   resId: string | null;
@@ -45,7 +45,6 @@ export class Lead {
     default: false,
   })
   finished: boolean;
-
 
   @ManyToOne(() => Bot, (bot) => bot.leads, {
     nullable: true,

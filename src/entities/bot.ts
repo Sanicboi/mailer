@@ -14,7 +14,7 @@ export enum BotState {
   POSSIBLE_SPAMBLOCK = 3,
   CONFIRMED_SPAMBLOCK = 4,
   BANNED = 5,
-  LOGGING_IN = 6
+  LOGGING_IN = 6,
 }
 
 @Entity()
@@ -27,9 +27,9 @@ export class Bot {
   })
   token: string;
 
-  @Column('enum', {
+  @Column("enum", {
     enum: BotState,
-    default: BotState.IDLE
+    default: BotState.IDLE,
   })
   state: BotState;
 
