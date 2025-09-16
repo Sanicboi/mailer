@@ -33,6 +33,7 @@ class Mailer {
     await agent.connect();
     await agent.sendCode();
     this._currentPhone = agent.phone;
+    this._agents.push(agent);
   }
 
   public async loginAgent(code: string): Promise<void> {
