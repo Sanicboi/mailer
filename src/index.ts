@@ -6,7 +6,6 @@ import { BotState } from "./entities/bot";
 import path from "path";
 import axios, { AxiosResponse } from "axios";
 import { Lead } from "./entities/lead";
-import fs from "fs/promises";
 import { ai } from "./services/AI";
 
 const Btn = (text: string, data: string) => [

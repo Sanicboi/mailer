@@ -38,6 +38,7 @@ class Mailer {
   public async loginAgent(code: string): Promise<void> {
     if (!this._currentPhone) return;
     const agent = this._agents.find((el) => el.phone === this._currentPhone);
+    console.log(this._agents)
     if (!agent) return;
     await agent.login(code);
     await agent.create();
