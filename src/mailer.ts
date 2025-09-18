@@ -48,7 +48,7 @@ class Mailer {
 
   public async mail(numAgents: number, numPerAgent: number): Promise<void> {
     this._agents.sort(
-      (a, b) => a.lastMessage.getTime() - b.lastMessage.getTime(),
+      (a, b) => (a.lastMessage?.getTime() ?? -1) - (b.lastMessage.getTime() ?? -1),
     );
     const take = Math.min(numAgents, this._agents.length);
     for (let i = 0; i < take; i++) {
