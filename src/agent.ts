@@ -131,7 +131,8 @@ export class Agent {
   public async finish(): Promise<void> {
     switch (this.state) {
       case BotState.MAILING:
-        await db
+        if (this._leadsList.length > 0) {
+          await db
           .createQueryBuilder(Lead, "lead")
           .update()
           .where("lead.username IN (:...ids)", {
@@ -145,6 +146,7 @@ export class Agent {
             resId: null,
           })
           .execute();
+        }
         this._leadsList = [];
         this._bot.state = BotState.IDLE;
         break;
