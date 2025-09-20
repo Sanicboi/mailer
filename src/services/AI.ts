@@ -84,6 +84,7 @@ class AI {
           content: [
             {
               type: "input_file",
+              file_id: this.fileId
             },
           ],
         },
