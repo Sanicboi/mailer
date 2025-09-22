@@ -60,7 +60,9 @@ class Mailer {
     while (this._agents[i].toMail > 0) {
       if (this._agents[i].state !== BotState.MAILING) break;
       await this._agents[i].mail();
+      console.log(i)
       i = (i + 1) % this._agents.length;
+      console.log(i);
       if (i === 0) await wait(1);
     }
 
