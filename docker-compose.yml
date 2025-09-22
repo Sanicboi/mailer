@@ -7,11 +7,12 @@ services:
       POSTGRES_USER: "test"
       POSTGRES_PASSWORD: "test"
       POSTGRES_DB: "test"
+    volumes:
+      - ~/mailer-data:/var/lib/postgresql/data:rw
   server:
     restart: always
     build: .
     env_file: .env
     ports:
       - 88:80
-    volumes:
-      - ~/mailer-data:/var/lib/postgresql/data:rw
+
