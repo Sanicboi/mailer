@@ -233,6 +233,8 @@ export class Agent {
   }
 
   public async mail(): Promise<void> {
+    console.log('Mailing');
+    console.log('lead list length', this._leadsList.length)
     const lead = this._leadsList.pop();
     if (!lead) return;
 
@@ -247,6 +249,7 @@ export class Agent {
         message: msg.text,
       });
     } catch (error) {
+      console.error(error);
       this._bot.state = BotState.POSSIBLE_SPAMBLOCK;
     }
     this._bot.lastMessage = new Date();

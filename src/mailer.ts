@@ -61,7 +61,7 @@ class Mailer {
       if (this._agents[i].state !== BotState.MAILING) break;
       await this._agents[i].mail();
       i = (i + 1) % this._agents.length;
-      if (i === 0) await wait(5 * 60);
+      if (i === 0) await wait(1);
     }
 
     for (let i = 0; i < take; i++) {
