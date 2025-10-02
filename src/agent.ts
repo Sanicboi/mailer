@@ -116,8 +116,7 @@ export class Agent {
       .take(amount)
       .getMany();
 
-    if (this._leadsList.length > 0) {
-      await db
+    await db
       .createQueryBuilder(Lead, "lead")
       .update()
       .where("lead.username IN (:...ids)", {
@@ -127,7 +126,6 @@ export class Agent {
         bot: this._bot,
       })
       .execute();
-    }
   }
 
   public async finish(): Promise<void> {
